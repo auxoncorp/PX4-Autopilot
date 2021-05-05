@@ -56,6 +56,8 @@
 #include <uORB/PublicationMulti.hpp>
 #include <uORB/topics/battery_status.h>
 
+#include <modality_helpers/modality_helpers.h>
+
 /**
  * BatteryBase is a base class for any type of battery.
  *
@@ -66,7 +68,7 @@ class Battery : public ModuleParams
 {
 public:
 	Battery(int index, ModuleParams *parent, const int sample_interval_us);
-	~Battery() = default;
+    ~Battery() = default;
 
 	/**
 	 * Reset all battery stats and report invalid/nothing.
@@ -211,6 +213,13 @@ private:
 	float _remaining_voltage{-1.f};		///< normalized battery charge level remaining based on voltage
 	float _remaining{-1.f};			///< normalized battery charge level, selected based on config param
 	float _scale{1.f};
-	uint8_t _warning{battery_status_s::BATTERY_WARNING_NONE};
+	int32_t _warning{battery_status_s::BATTERY_WARNING_NONE};
 	hrt_abstime _last_timestamp{0};
+
+    modality_probe *_probe = MODALITY_PROBE_NULL_INITIALIZER;
+    uint8_t _probe_storage[PROBE_SIZE];
+    uint8_t _report_buffer[REPORT_SIZE];
+    int _report_socket = -1;
+    hrt_abstime _last_report_time = 0;
+    udp_control_message_receiver *_ctrl_msg_recvr = NULL;
 };

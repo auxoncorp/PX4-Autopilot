@@ -1,0 +1,2 @@
+component_id,id,name,description,tags,file,line
+31e0c252-5a6a-43fd-965a-40bd5556c257,828891432,PX4_COMMANDER,Commander probe,px4;module;commander,commander/Commander.cpp,533

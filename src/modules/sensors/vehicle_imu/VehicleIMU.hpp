@@ -53,6 +53,8 @@
 #include <uORB/topics/vehicle_imu.h>
 #include <uORB/topics/vehicle_imu_status.h>
 
+#include <modality_helpers/modality_helpers.h>
+
 namespace sensors
 {
 
@@ -125,6 +127,12 @@ private:
 		(ParamInt<px4::params::IMU_INTEG_RATE>) _param_imu_integ_rate,
 		(ParamInt<px4::params::IMU_GYRO_RATEMAX>) _param_imu_gyro_ratemax
 	)
+
+    modality_probe *_probe = MODALITY_PROBE_NULL_INITIALIZER;
+    uint8_t _probe_storage[PROBE_SIZE];
+    uint8_t _report_buffer[REPORT_SIZE];
+    int _report_socket = -1;
+    hrt_abstime _last_report_time = 0;
 };
 
 } // namespace sensors

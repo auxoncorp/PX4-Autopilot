@@ -38,3 +38,5 @@ uint8 BATTERY_WARNING_EMERGENCY = 3   # immediate landing required
 uint8 BATTERY_WARNING_FAILED = 4   # the battery has failed completely
 
 uint8 warning    # current battery warning
+
+uint8[12] snapshot    # Modality probe causal snapshot

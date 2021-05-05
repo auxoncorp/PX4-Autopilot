@@ -1,0 +1,21 @@
+name = "battery-warning-mutator"
+tags = ["battery", "power", "px4"]
+source_file = "battery.cpp"
+source_line = 207
+
+[[params]]
+name = "warning-level"
+type = "Enum"
+
+[params.constraints]
+minimum_effect_value = 0
+nominal_range = [0, 4]
+safety_range = [0, 4]
+hard_range = [0, 4]
+
+[params.enum_options]
+CRITICAL = 2
+EMERGENCY = 3
+FAILED = 4
+LOW = 1
+NONE = 0

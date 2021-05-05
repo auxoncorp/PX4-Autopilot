@@ -1,0 +1,5 @@
+name = "vehicle-imu-component"
+id = "dfa99a06-2d09-4d0b-a185-30812de2a8a4"
+code_hash = "a27f31626df05409d36afbadf63d8953bde123d8f4819330e6529bf431be2775"
+instrumentation_hash = "ebe7bbf89d33f29f35f341f4c7b96db961c9a98c646d13236f7ee6bc14b296bb"
+tags = []

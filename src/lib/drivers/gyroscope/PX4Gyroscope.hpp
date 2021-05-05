@@ -40,6 +40,8 @@
 #include <uORB/topics/sensor_gyro.h>
 #include <uORB/topics/sensor_gyro_fifo.h>
 
+#include <modality_helpers/modality_helpers.h>
+
 class PX4Gyroscope : public ModuleParams
 {
 public:
@@ -82,4 +84,11 @@ private:
 	DEFINE_PARAMETERS(
 		(ParamInt<px4::params::IMU_GYRO_RATEMAX>) _param_imu_gyro_rate_max
 	)
+
+    modality_probe *_probe = MODALITY_PROBE_NULL_INITIALIZER;
+    uint8_t _probe_storage[PROBE_SIZE];
+    uint8_t _report_buffer[REPORT_SIZE];
+    int _report_socket = -1;
+    hrt_abstime _last_report_time = 0;
+    udp_control_message_receiver *_ctrl_msg_recvr = NULL;
 };

@@ -41,6 +41,9 @@
 #include <uORB/topics/sensor_gyro.h>
 #include <uORB/topics/subsystem_info.h>
 
+#include "../../../commander_probe.h"
+#include "../../../commander_component_definitions.h"
+
 using namespace time_literals;
 
 bool PreFlightCheck::gyroCheck(orb_advert_t *mavlink_log_pub, vehicle_status_s &status, const uint8_t instance,
@@ -53,6 +56,15 @@ bool PreFlightCheck::gyroCheck(orb_advert_t *mavlink_log_pub, vehicle_status_s &
 	if (exists) {
 
 		uORB::SubscriptionData<sensor_gyro_s> gyro{ORB_ID(sensor_gyro), instance};
+
+        if(gyro.update())
+        {
+            const size_t err = modality_probe_merge_snapshot_bytes(
+                    g_commander_probe,
+                    &gyro.get().snapshot[0],
+                    sizeof(gyro.get().snapshot));
+            assert(err == MODALITY_PROBE_ERROR_OK);
+        }
 
 		gyro_valid = (hrt_elapsed_time(&gyro.get().timestamp) < 1_s);
 

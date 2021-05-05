@@ -45,6 +45,9 @@
 #include <cstring>
 #include <px4_platform_common/defines.h>
 
+#include "battery_component_definitions.h"
+#include "generated_mutators/battery_warning_mutator.h"
+
 using namespace time_literals;
 
 Battery::Battery(int index, ModuleParams *parent, const int sample_interval_us) :
@@ -101,6 +104,26 @@ Battery::Battery(int index, ModuleParams *parent, const int sample_interval_us) 
 	_param_handles.source_old = param_find("BAT_SOURCE");
 
 	updateParams();
+
+    probe_report_socket_init(&_report_socket);
+    _ctrl_msg_recvr = udp_control_message_receiver_new();
+    assert(_ctrl_msg_recvr != NULL);
+    size_t err = udp_control_message_receiver_run(UDP_CONTROL_RECVR_BATTERY, _ctrl_msg_recvr);
+    assert(err == 0);
+
+    err = MODALITY_PROBE_INIT(
+            &_probe_storage[0],
+            sizeof(_probe_storage),
+            PX4_BATTERY,
+            PX4_WALL_CLOCK_RESOLUTION_NS,
+            PX4_WALL_CLOCK_ID,
+            &next_persistent_sequence_id,
+            NULL, /* No user data needed for our next_persistent_sequence_id implementation */
+            &_probe,
+            MODALITY_TAGS("px4", "library", "battery", "power", "control-plane"),
+            "Battery probe");
+    assert(err == MODALITY_PROBE_ERROR_OK);
+    LOG_PROBE_INIT_W_RECVR(PX4_BATTERY, UDP_CONTROL_RECVR_BATTERY);
 }
 
 void Battery::reset()
@@ -116,11 +139,25 @@ void Battery::reset()
 	_battery_status.capacity = _params.capacity;
 	_battery_status.temperature = NAN;
 	_battery_status.id = (uint8_t) _index;
+
+    const size_t err = MODALITY_PROBE_RECORD(
+            _probe,
+            STATE_RESET,
+            MODALITY_TAGS("px4", "battery", "power"),
+            "Battery reset it's state");
+    assert(err == MODALITY_PROBE_ERROR_OK);
 }
 
 void Battery::updateBatteryStatus(const hrt_abstime &timestamp, float voltage_v, float current_a, bool connected,
 				  int source, int priority, float throttle_normalized)
 {
+    /* Check for new control messages */
+    size_t err = udp_control_message_dequeue(
+            _ctrl_msg_recvr,
+            control_msg_callback,
+            (void*) _probe);
+    assert(err == 0);
+
 	reset();
 
 	if (!_battery_initialized) {
@@ -129,6 +166,15 @@ void Battery::updateBatteryStatus(const hrt_abstime &timestamp, float voltage_v,
 		_throttle_filter.reset(throttle_normalized);
 	}
 
+    err = MODALITY_PROBE_RECORD_W_F32_W_TIME(
+            _probe,
+            RAW_VOLTAGE,
+            voltage_v,
+            hrt_time_ns(),
+            MODALITY_TAGS("px4", "battery", "power", "time"),
+            "Battery sampled raw voltage");
+    assert(err == 0);
+
 	_voltage_filter_v.update(voltage_v);
 	_current_filter_a.update(current_a);
 	_throttle_filter.update(throttle_normalized);
@@ -136,9 +182,60 @@ void Battery::updateBatteryStatus(const hrt_abstime &timestamp, float voltage_v,
 	estimateRemaining(_voltage_filter_v.getState(), _current_filter_a.getState(), _throttle_filter.getState());
 	computeScale();
 
+    err = MODALITY_PROBE_RECORD_W_F32_W_TIME(
+            _probe,
+            FILTERED_VOLTAGE,
+            _voltage_filter_v.getState(),
+            hrt_time_ns(),
+            MODALITY_TAGS("px4", "battery", "voltage", "power", "time"),
+            "Battery filtered voltage");
+    assert(err == MODALITY_PROBE_ERROR_OK);
+
+    err = MODALITY_PROBE_RECORD_W_BOOL(
+            _probe,
+            CONNECTED,
+            connected,
+            MODALITY_TAGS("px4", "battery", "power"),
+            "Battery connected state");
+    assert(err == MODALITY_PROBE_ERROR_OK);
+
 	if (_battery_initialized) {
 		determineWarning(connected);
 	}
+
+    /* Generate a mutator that exposes the '_warning' data as a parameter */
+    MODALITY_MUTATOR(
+            _probe,
+            BATTERY_WARNING_MUTATOR,
+            warning_level,
+            MODALITY_PARAM_DEF(
+                ENUM,
+                0, /* battery_status_s::BATTERY_WARNING_NONE */
+                ENUM_VALUE_NAME(0, "NONE"),
+                ENUM_VALUE_NAME(1, "LOW"),
+                ENUM_VALUE_NAME(2, "CRITICAL"),
+                ENUM_VALUE_NAME(3, "EMERGENCY"),
+                ENUM_VALUE_NAME(4, "FAILED")),
+            &_warning,
+            sizeof(_warning),
+            MODALITY_TAGS("px4", "battery", "power"));
+
+    err = MODALITY_PROBE_RECORD_W_U8(
+            _probe,
+            WARNING_LEVEL,
+            (uint8_t) _warning,
+            MODALITY_TAGS("px4", "battery", "power"),
+            "Battery warning level");
+    assert(err == MODALITY_PROBE_ERROR_OK);
+
+    err = MODALITY_PROBE_EXPECT(
+            _probe,
+            WARNING_LEVEL_OK,
+            _warning < battery_status_s::BATTERY_WARNING_CRITICAL,
+            MODALITY_TAGS("px4", "battery", "power"),
+            MODALITY_SEVERITY(8),
+            "Battery nominal voltage check");
+    assert(err == MODALITY_PROBE_ERROR_OK);
 
 	if (_voltage_filter_v.getState() > 2.1f) {
 		_battery_initialized = true;
@@ -148,7 +245,7 @@ void Battery::updateBatteryStatus(const hrt_abstime &timestamp, float voltage_v,
 		_battery_status.current_a = current_a;
 		_battery_status.current_filtered_a = _current_filter_a.getState();
 		_battery_status.discharged_mah = _discharged_mah;
-		_battery_status.warning = _warning;
+		_battery_status.warning = (uint8_t) _warning;
 		_battery_status.remaining = _remaining;
 		_battery_status.connected = connected;
 		_battery_status.source = source;
@@ -164,8 +261,22 @@ void Battery::updateBatteryStatus(const hrt_abstime &timestamp, float voltage_v,
 	}
 
 	if (source == _params.source) {
+        size_t snapshot_size = 0;
+        err = modality_probe_produce_snapshot_bytes(
+                _probe,
+                &_battery_status.snapshot[0],
+                sizeof(_battery_status.snapshot),
+                &snapshot_size);
+        assert(err == MODALITY_PROBE_ERROR_OK);
+
 		publish();
 	}
+
+    const int should_report = update_last_report_time(REPORT_INTERVAL_US, &_last_report_time);
+    if(should_report != 0)
+    {
+        send_probe_report(_probe, _report_socket, _report_buffer, sizeof(_report_buffer));
+    }
 }
 
 void Battery::publish()
@@ -239,7 +350,14 @@ void Battery::determineWarning(bool connected)
 		// propagate warning state only if the state is higher, otherwise remain in current warning state
 		if (_remaining < _params.emergen_thr) {
 			_warning = battery_status_s::BATTERY_WARNING_EMERGENCY;
-
+            const size_t err = MODALITY_PROBE_FAILURE_W_TIME(
+                    _probe,
+                    EMERGENCY_WARNING_LEVEL,
+                    hrt_time_ns(),
+                    MODALITY_TAGS("px4", "battery", "power"),
+                    MODALITY_SEVERITY(10),
+                    "Battery emergency warning level");
+            assert(err == MODALITY_PROBE_ERROR_OK);
 		} else if (_remaining < _params.crit_thr) {
 			_warning = battery_status_s::BATTERY_WARNING_CRITICAL;
 

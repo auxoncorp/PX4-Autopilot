@@ -31,9 +31,38 @@
 #
 ############################################################################
 
+# Keep asserts
+add_definitions(-UNDEBUG)
+
 px4_add_library(drivers_gyroscope
 	PX4Gyroscope.cpp
 	PX4Gyroscope.hpp
+    generated_mutators/gyroscope_mutator.c
 )
 target_compile_options(drivers_gyroscope PRIVATE ${MAX_CUSTOM_OPT_LEVEL})
-target_link_libraries(drivers_gyroscope PRIVATE conversion drivers__device)
+target_link_libraries(drivers_gyroscope PRIVATE conversion drivers__device modality_helpers)
+
+modality_probe_generate_manifest(
+    TARGET drivers_gyroscope
+    DEPENDS PX4Gyroscope.cpp
+    COMPONENT_NAME "gyroscope-component"
+    OUTPUT_PATH "gyroscope-component"
+    EXCLUDES "generated_mutators"
+    FILE_EXTENSIONS "cpp"
+    SOURCE_PATH "."
+    )
+
+modality_probe_generate_header(
+    TARGET drivers_gyroscope
+    OUTPUT_FILE "gyroscope_component_definitions.h"
+    COMPONENT_PATH "gyroscope-component"
+    )
+
+modality_probe_generate_mutators(
+    TARGET drivers_gyroscope
+    DEPENDS PX4Gyroscope.cpp
+    FILE_EXTENSIONS "cpp"
+    COMPONENT_PATH "gyroscope-component"
+    OUTPUT_PATH "generated_mutators"
+    SOURCE_PATH "."
+    )

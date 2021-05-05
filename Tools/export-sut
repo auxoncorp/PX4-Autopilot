@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+
+import sys
+import os
+import toml
+import shutil
+from shutil import copyfile, copytree, rmtree
+from os import path
+import subprocess
+from datetime import datetime
+import tarfile
+
+stat = subprocess.call(['systemctl', 'is-active', '--quiet', 'modalityd'])
+if stat == 0:
+    print('Shutdown the modalityd service first, run "sudo systemctl stop modalityd"')
+    sys.exit(1);
+
+now = datetime.now().strftime('%Y-%m-%dT%H-%M-%SZ')
+project = 'px4-export-' + now
+project_path = path.join('/tmp', project)
+project_tar = project_path + '.tar.gz'
+print('Exporting to {}'.format(project_tar))
+
+os.mkdir(project_path)
+copyfile('Modality.toml', path.join(project_path, 'Modality.toml'))
+copyfile('SUT.toml', path.join(project_path, 'SUT.toml'))
+modality = toml.load('SUT.toml')
+for c in modality['component_paths']:
+    copytree(c, path.join(project_path, c))
+copytree('/var/lib/modality', path.join(project_path, 'data'))
+
+package_version_file = open(path.join(project_path, "package_version.txt"), "wb")
+p1 = subprocess.Popen(('dpkg', '-s', 'modality'), stdout=subprocess.PIPE)
+p2 = subprocess.Popen(('grep', '^Version:'), stdin=p1.stdout, stdout=subprocess.PIPE)
+p1.stdout.close()
+version = p2.communicate()[0]
+package_version_file.write(version)
+package_version_file.close()
+
+with tarfile.open(project_tar, "w:gz") as tar:
+    tar.add(project_path, arcname=path.basename(project_path))
+
+rmtree(project_path)

@@ -79,6 +79,18 @@
 #include "vehicle_air_data/VehicleAirData.hpp"
 #include "vehicle_imu/VehicleIMU.hpp"
 
+#include <modality_helpers/modality_helpers.h>
+
+#include "sensors_probe.h"
+#include "sensors_component_definitions.h"
+
+/* Global probe used by the sensors module and its utilities */
+modality_probe *g_sensors_probe = MODALITY_PROBE_NULL_INITIALIZER;
+static uint8_t g_probe_storage[PROBE_SIZE];
+static uint8_t g_report_buffer[REPORT_SIZE];
+static int g_report_socket = -1;
+static hrt_abstime g_last_report_time = 0;
+
 using namespace sensors;
 using namespace time_literals;
 
@@ -222,6 +234,23 @@ Sensors::Sensors(bool hil_enabled) :
 
 	_vehicle_acceleration.Start();
 	_vehicle_angular_velocity.Start();
+
+    probe_report_socket_init(&g_report_socket);
+
+    assert(g_sensors_probe == MODALITY_PROBE_NULL_INITIALIZER);
+    const size_t err = MODALITY_PROBE_INIT(
+            &g_probe_storage[0],
+            sizeof(g_probe_storage),
+            PX4_SENSORS,
+            PX4_WALL_CLOCK_RESOLUTION_NS,
+            PX4_WALL_CLOCK_ID,
+            &next_persistent_sequence_id,
+            NULL, /* No user data needed for our next_persistent_sequence_id implementation */
+            &g_sensors_probe,
+            MODALITY_TAGS("px4", "module", "sensors"),
+            "Sensors probe");
+    assert(err == MODALITY_PROBE_ERROR_OK);
+    LOG_PROBE_INIT(PX4_SENSORS);
 }
 
 Sensors::~Sensors()
@@ -422,6 +451,13 @@ void Sensors::adc_poll()
 	}
 
 #endif /* ADC_AIRSPEED_VOLTAGE_CHANNEL */
+
+    const size_t err = MODALITY_PROBE_RECORD(
+            g_sensors_probe,
+            ADC_POLLED,
+            MODALITY_TAGS("px4", "sensors", "adc"),
+            "ADC polled");
+    assert(err == MODALITY_PROBE_ERROR_OK);
 }
 
 void Sensors::InitializeVehicleAirData()
@@ -542,6 +578,13 @@ void Sensors::Run()
 	vehicle_magnetometer_s magnetometer{};
 	_voted_sensors_update.sensorsPoll(_sensor_combined, magnetometer);
 
+    size_t err = MODALITY_PROBE_RECORD(
+            g_sensors_probe,
+            SENSORS_POLLED,
+            MODALITY_TAGS("px4", "sensors"),
+            "Sensors polled");
+    assert(err == MODALITY_PROBE_ERROR_OK);
+
 	// check analog airspeed
 	adc_poll();
 
@@ -559,6 +602,13 @@ void Sensors::Run()
 	if (_sensor_combined.timestamp != _sensor_combined_prev_timestamp) {
 
 		_voted_sensors_update.setRelativeTimestamps(_sensor_combined);
+        size_t snapshot_size = 0;
+        err = modality_probe_produce_snapshot_bytes(
+                g_sensors_probe,
+                &_sensor_combined.snapshot[0],
+                sizeof(_sensor_combined.snapshot),
+                &snapshot_size);
+        assert(err == MODALITY_PROBE_ERROR_OK);
 		_sensor_pub.publish(_sensor_combined);
 		_sensor_combined_prev_timestamp = _sensor_combined.timestamp;
 
@@ -585,6 +635,12 @@ void Sensors::Run()
 		// check parameters for updates
 		parameter_update_poll();
 	}
+
+    const int should_report = update_last_report_time(REPORT_INTERVAL_US, &g_last_report_time);
+    if(should_report != 0)
+    {
+        send_probe_report(g_sensors_probe, g_report_socket, g_report_buffer, sizeof(g_report_buffer));
+    }
 
 	perf_end(_loop_perf);
 }

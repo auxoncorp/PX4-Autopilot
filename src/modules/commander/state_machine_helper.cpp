@@ -49,6 +49,9 @@
 #include "state_machine_helper.h"
 #include "commander_helper.h"
 
+#include "commander_probe.h"
+#include "commander_component_definitions.h"
+
 static constexpr const char reason_no_rc[] = "No manual control stick input";
 static constexpr const char reason_no_offboard[] = "no offboard";
 static constexpr const char reason_no_rc_and_no_offboard[] = "no RC and no offboard";
@@ -992,21 +995,41 @@ void battery_failsafe(orb_advert_t *mavlink_log_pub, const vehicle_status_s &sta
 		      const vehicle_status_flags_s &status_flags, commander_state_s *internal_state, const uint8_t battery_warning,
 		      const low_battery_action_t low_battery_action)
 {
+    size_t err;
 	switch (battery_warning) {
 	case battery_status_s::BATTERY_WARNING_NONE:
 		break;
 
 	case battery_status_s::BATTERY_WARNING_LOW:
 		mavlink_log_critical(mavlink_log_pub, "Low battery level! Return advised");
+        err = MODALITY_PROBE_RECORD(
+                g_commander_probe,
+                LOW_BATTERY_RETURN_ADVISED,
+                MODALITY_TAGS("px4", "commander", "battery"),
+                "Low battery level return advised");
+        assert(err == MODALITY_PROBE_ERROR_OK);
 		break;
 
 	case battery_status_s::BATTERY_WARNING_CRITICAL:
+        err = MODALITY_PROBE_RECORD(
+                g_commander_probe,
+                CRITICAL_BATTERY_LEVEL,
+                MODALITY_TAGS("px4", "commander", "battery"),
+                "Critical battery level");
+        assert(err == MODALITY_PROBE_ERROR_OK);
 
 		static constexpr char battery_critical[] = "Critical battery level!";
 
 		switch (low_battery_action) {
 		case LOW_BAT_ACTION::WARNING:
 			mavlink_log_critical(mavlink_log_pub, "%s, landing advised", battery_critical);
+            err = MODALITY_PROBE_FAILURE(
+                    g_commander_probe,
+                    CRITICAL_BATTERY_LANDING_ADVISED,
+                    MODALITY_TAGS("px4", "commander", "battery"),
+                    MODALITY_SEVERITY(7),
+                    "Critical battery level landing advised");
+            assert(err == MODALITY_PROBE_ERROR_OK);
 			break;
 
 		case LOW_BAT_ACTION::RETURN:
@@ -1018,11 +1041,25 @@ void battery_failsafe(orb_advert_t *mavlink_log_pub, const vehicle_status_s &sta
 				internal_state->main_state = commander_state_s::MAIN_STATE_AUTO_RTL;
 				internal_state->timestamp = hrt_absolute_time();
 				mavlink_log_critical(mavlink_log_pub, "%s, executing RTL", battery_critical);
+                err = MODALITY_PROBE_FAILURE(
+                        g_commander_probe,
+                        CRITICAL_BATTERY_RTL,
+                        MODALITY_TAGS("px4", "commander", "battery"),
+                        MODALITY_SEVERITY(8),
+                        "Critical battery level RTL");
+                assert(err == MODALITY_PROBE_ERROR_OK);
 
 			} else {
 				internal_state->main_state = commander_state_s::MAIN_STATE_AUTO_LAND;
 				internal_state->timestamp = hrt_absolute_time();
 				mavlink_log_emergency(mavlink_log_pub, "%s, can't execute RTL, landing instead", battery_critical);
+                err = MODALITY_PROBE_FAILURE(
+                        g_commander_probe,
+                        CRITICAL_BATTERY_RTL_FALLBACK_LANDING,
+                        MODALITY_TAGS("px4", "commander", "battery"),
+                        MODALITY_SEVERITY(8),
+                        "Critical battery level landing instead of RTL");
+                assert(err == MODALITY_PROBE_ERROR_OK);
 			}
 
 			break;
@@ -1031,6 +1068,13 @@ void battery_failsafe(orb_advert_t *mavlink_log_pub, const vehicle_status_s &sta
 			internal_state->main_state = commander_state_s::MAIN_STATE_AUTO_LAND;
 			internal_state->timestamp = hrt_absolute_time();
 			mavlink_log_emergency(mavlink_log_pub, "%s, landing", battery_critical);
+            err = MODALITY_PROBE_FAILURE(
+                    g_commander_probe,
+                    CRITICAL_BATTERY_LANDING,
+                    MODALITY_TAGS("px4", "commander", "battery"),
+                    MODALITY_SEVERITY(8),
+                    "Critical battery level landing");
+            assert(err == MODALITY_PROBE_ERROR_OK);
 
 			break;
 		}
@@ -1038,12 +1082,25 @@ void battery_failsafe(orb_advert_t *mavlink_log_pub, const vehicle_status_s &sta
 		break;
 
 	case battery_status_s::BATTERY_WARNING_EMERGENCY:
+        err = MODALITY_PROBE_RECORD(
+                g_commander_probe,
+                EMERGENCY_BATTERY_LEVEL,
+                MODALITY_TAGS("px4", "commander", "battery"),
+                "Emergency battery level");
+        assert(err == MODALITY_PROBE_ERROR_OK);
 
 		static constexpr char battery_dangerous[] = "Dangerous battery level!";
 
 		switch (low_battery_action) {
 		case LOW_BAT_ACTION::WARNING:
 			mavlink_log_emergency(mavlink_log_pub, "%s, please land!", battery_dangerous);
+            err = MODALITY_PROBE_FAILURE(
+                    g_commander_probe,
+                    EMERGENCY_BATTERY_LANDING_ADVISED,
+                    MODALITY_TAGS("px4", "commander", "battery"),
+                    MODALITY_SEVERITY(9),
+                    "Emergency battery level landing advised");
+            assert(err == MODALITY_PROBE_ERROR_OK);
 			break;
 
 		case LOW_BAT_ACTION::RETURN:
@@ -1051,11 +1108,25 @@ void battery_failsafe(orb_advert_t *mavlink_log_pub, const vehicle_status_s &sta
 				internal_state->main_state = commander_state_s::MAIN_STATE_AUTO_RTL;
 				internal_state->timestamp = hrt_absolute_time();
 				mavlink_log_critical(mavlink_log_pub, "%s, executing RTL", battery_dangerous);
+                err = MODALITY_PROBE_FAILURE(
+                        g_commander_probe,
+                        EMERGENCY_BATTERY_RTL,
+                        MODALITY_TAGS("px4", "commander", "battery"),
+                        MODALITY_SEVERITY(9),
+                        "Emergency battery level RTL");
+                assert(err == MODALITY_PROBE_ERROR_OK);
 
 			} else {
 				internal_state->main_state = commander_state_s::MAIN_STATE_AUTO_LAND;
 				internal_state->timestamp = hrt_absolute_time();
 				mavlink_log_emergency(mavlink_log_pub, "%s, can't execute RTL, landing instead", battery_dangerous);
+                err = MODALITY_PROBE_FAILURE(
+                        g_commander_probe,
+                        EMERGENCY_BATTERY_RTL_FALLBACK_LANDING,
+                        MODALITY_TAGS("px4", "commander", "battery"),
+                        MODALITY_SEVERITY(9),
+                        "Emergency battery level landing instead of RTL");
+                assert(err == MODALITY_PROBE_ERROR_OK);
 			}
 
 			break;
@@ -1067,6 +1138,13 @@ void battery_failsafe(orb_advert_t *mavlink_log_pub, const vehicle_status_s &sta
 			internal_state->main_state = commander_state_s::MAIN_STATE_AUTO_LAND;
 			internal_state->timestamp = hrt_absolute_time();
 			mavlink_log_emergency(mavlink_log_pub, "%s, landing", battery_dangerous);
+            err = MODALITY_PROBE_FAILURE(
+                    g_commander_probe,
+                    EMERGENCY_BATTERY_LANDING,
+                    MODALITY_TAGS("px4", "commander", "battery"),
+                    MODALITY_SEVERITY(9),
+                    "Emergency battery level landing");
+            assert(err == MODALITY_PROBE_ERROR_OK);
 
 			break;
 		}
@@ -1075,6 +1153,13 @@ void battery_failsafe(orb_advert_t *mavlink_log_pub, const vehicle_status_s &sta
 
 	case battery_status_s::BATTERY_WARNING_FAILED:
 		mavlink_log_emergency(mavlink_log_pub, "Battery failure detected");
+        err = MODALITY_PROBE_FAILURE(
+                g_commander_probe,
+                BATTERY_FAILURE_DETECTED,
+                MODALITY_TAGS("px4", "commander", "battery"),
+                MODALITY_SEVERITY(10),
+                "Battery failure detected");
+        assert(err == MODALITY_PROBE_ERROR_OK);
 		break;
 	}
 }

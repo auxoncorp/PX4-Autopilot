@@ -298,6 +298,8 @@ if(PYTHON_COVERAGE)
 	set(PYTHON_EXECUTABLE coverage run -p)
 endif()
 
+find_package(ModalityProbe REQUIRED)
+
 #=============================================================================
 # get chip and chip manufacturer
 #

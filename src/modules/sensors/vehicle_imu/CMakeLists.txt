@@ -31,6 +31,9 @@
 #
 ############################################################################
 
+# Keep asserts
+add_definitions(-UNDEBUG)
+
 px4_add_library(vehicle_imu
 	Integrator.cpp
 	Integrator.hpp
@@ -38,4 +41,19 @@ px4_add_library(vehicle_imu
 	VehicleIMU.hpp
 )
 target_compile_options(vehicle_imu PRIVATE ${MAX_CUSTOM_OPT_LEVEL})
-target_link_libraries(vehicle_imu PRIVATE sensor_calibration px4_work_queue)
+target_link_libraries(vehicle_imu PRIVATE sensor_calibration px4_work_queue modality_helpers)
+
+modality_probe_generate_manifest(
+    TARGET vehicle_imu
+    DEPENDS VehicleIMU.cpp
+    COMPONENT_NAME "vehicle-imu-component"
+    OUTPUT_PATH "vehicle-imu-component"
+    FILE_EXTENSIONS "cpp"
+    SOURCE_PATH "."
+    )
+
+modality_probe_generate_header(
+    TARGET vehicle_imu
+    OUTPUT_FILE "vehicle_imu_component_definitions.h"
+    COMPONENT_PATH "vehicle-imu-component"
+    )

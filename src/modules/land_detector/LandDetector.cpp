@@ -40,6 +40,8 @@
 
 #include "LandDetector.h"
 
+#include "land_detector_component_definitions.h"
+
 using namespace time_literals;
 
 namespace land_detector
@@ -48,7 +50,23 @@ namespace land_detector
 LandDetector::LandDetector() :
 	ModuleParams(nullptr),
 	ScheduledWorkItem(MODULE_NAME, px4::wq_configurations::nav_and_controllers)
-{}
+{
+    probe_report_socket_init(&_report_socket);
+
+    const size_t err = MODALITY_PROBE_INIT(
+            &_probe_storage[0],
+            sizeof(_probe_storage),
+            PX4_LAND_DETECTOR,
+            PX4_WALL_CLOCK_RESOLUTION_NS,
+            PX4_WALL_CLOCK_ID,
+            &next_persistent_sequence_id,
+            NULL, /* No user data needed for our next_persistent_sequence_id implementation */
+            &_probe,
+            MODALITY_TAGS("px4", "module", "land-detector"),
+            "Land detector probe");
+    assert(err == MODALITY_PROBE_ERROR_OK);
+    LOG_PROBE_INIT(PX4_LAND_DETECTOR);
+}
 
 LandDetector::~LandDetector()
 {
@@ -111,6 +129,35 @@ void LandDetector::Run()
 	const float alt_max = _get_max_altitude() > 0.0f ? _get_max_altitude() : INFINITY;
 	const bool in_ground_effect = _ground_effect_hysteresis.get_state();
 
+    size_t err = MODALITY_PROBE_RECORD_W_BOOL(
+            _probe,
+            FREEFALL,
+            freefallDetected,
+            MODALITY_TAGS("px4", "land-detector", "freefall"),
+            "Land detector freefall");
+    assert(err == MODALITY_PROBE_ERROR_OK);
+    err = MODALITY_PROBE_RECORD_W_BOOL(
+            _probe,
+            GROUND_CONTACT,
+            ground_contactDetected,
+            MODALITY_TAGS("px4", "land-detector"),
+            "Land detector ground contact");
+    assert(err == MODALITY_PROBE_ERROR_OK);
+    err = MODALITY_PROBE_RECORD_W_BOOL(
+            _probe,
+            MAYBE_LANDED,
+            maybe_landedDetected,
+            MODALITY_TAGS("px4", "land-detector"),
+            "Land detector might have landed");
+    assert(err == MODALITY_PROBE_ERROR_OK);
+    err = MODALITY_PROBE_RECORD_W_BOOL(
+            _probe,
+            LANDED,
+            landDetected,
+            MODALITY_TAGS("px4", "land-detector"),
+            "Land detector currently landed (stage 3)");
+    assert(err == MODALITY_PROBE_ERROR_OK);
+
 	// publish at 1 Hz, very first time, or when the result has changed
 	if ((hrt_elapsed_time(&_land_detected.timestamp) >= 1_s) ||
 	    (_land_detected.landed != landDetected) ||
@@ -123,6 +170,13 @@ void LandDetector::Run()
 		if (!landDetected && _land_detected.landed && _takeoff_time == 0) { /* only set take off time once, until disarming */
 			// We did take off
 			_takeoff_time = now_us;
+
+            err = MODALITY_PROBE_RECORD(
+                    _probe,
+                    TAKE_OFF_DETECTED,
+                    MODALITY_TAGS("px4", "land-detector", "takeoff"),
+                    "Take off detected");
+            assert(err == MODALITY_PROBE_ERROR_OK);
 		}
 
 		_land_detected.landed = landDetected;
@@ -132,6 +186,15 @@ void LandDetector::Run()
 		_land_detected.alt_max = alt_max;
 		_land_detected.in_ground_effect = in_ground_effect;
 		_land_detected.timestamp = hrt_absolute_time();
+
+        size_t snapshot_size = 0;
+        err = modality_probe_produce_snapshot_bytes(
+                _probe,
+                &_land_detected.snapshot[0],
+                sizeof(_land_detected.snapshot),
+                &snapshot_size);
+        assert(err == MODALITY_PROBE_ERROR_OK);
+
 		_vehicle_land_detected_pub.publish(_land_detected);
 	}
 
@@ -155,6 +218,12 @@ void LandDetector::Run()
 	_previous_armed_state = _armed;
 
 	perf_end(_cycle_perf);
+
+    const int should_report = update_last_report_time(REPORT_INTERVAL_US, &_last_report_time);
+    if(should_report != 0)
+    {
+        send_probe_report(_probe, _report_socket, _report_buffer, sizeof(_report_buffer));
+    }
 
 	if (should_exit()) {
 		ScheduleClear();

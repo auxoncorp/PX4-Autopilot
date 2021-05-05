@@ -36,6 +36,9 @@
 
 #include <lib/drivers/device/Device.hpp>
 
+#include "gyroscope_component_definitions.h"
+#include "generated_mutators/gyroscope_mutator.h"
+
 using namespace time_literals;
 using matrix::Vector3f;
 
@@ -61,6 +64,26 @@ PX4Gyroscope::PX4Gyroscope(uint32_t device_id, ORB_PRIO priority, enum Rotation 
 	_sensor_pub.advertise();
 
 	updateParams();
+
+    probe_report_socket_init(&_report_socket);
+    _ctrl_msg_recvr = udp_control_message_receiver_new();
+    assert(_ctrl_msg_recvr != NULL);
+    size_t err = udp_control_message_receiver_run(UDP_CONTROL_RECVR_GYROSCOPE, _ctrl_msg_recvr);
+    assert(err == 0);
+
+    err = MODALITY_PROBE_INIT(
+            &_probe_storage[0],
+            sizeof(_probe_storage),
+            PX4_GYROSCOPE,
+            PX4_WALL_CLOCK_RESOLUTION_NS,
+            PX4_WALL_CLOCK_ID,
+            &next_persistent_sequence_id,
+            NULL, /* No user data needed for our next_persistent_sequence_id implementation */
+            &_probe,
+            MODALITY_TAGS("px4", "library", "gyroscope", "sensor", "control-plane"),
+            "Gyroscope probe");
+    assert(err == MODALITY_PROBE_ERROR_OK);
+    LOG_PROBE_INIT_W_RECVR(PX4_GYROSCOPE, UDP_CONTROL_RECVR_GYROSCOPE);
 }
 
 PX4Gyroscope::~PX4Gyroscope()
@@ -136,5 +159,59 @@ void PX4Gyroscope::Publish(const hrt_abstime &timestamp_sample, float x, float y
 	report.z = z * _scale;
 	report.timestamp = hrt_absolute_time();
 
+    /* Generate a mutator that exposes the 'report.z' data as a parameter (units in radians/second) */
+    MODALITY_MUTATOR(
+            _probe,
+            GYROSCOPE_MUTATOR,
+            z_axis,
+            MODALITY_PARAM_DEF(
+                F32,
+                0.0f,
+                NOMINAL(-34.90659f, 34.90659f), /* 2000 deg/s == 34.90659 rad/s */
+                SAFETY(-34.90659f, 34.90659f),
+                HARD(-34.90659f, 34.90659f)),
+            &report.z,
+            sizeof(report.z),
+            MODALITY_TAGS("px4", "gyroscope"));
+
+    size_t err = MODALITY_PROBE_RECORD_W_F32_W_TIME(
+            _probe,
+            X_AXIS,
+            report.x,
+            US_TO_NS(report.timestamp),
+            MODALITY_TAGS("px4", "gyroscope", "sensor", "time"),
+            "Gyroscope x axis");
+    assert(err == 0);
+    err = MODALITY_PROBE_RECORD_W_F32_W_TIME(
+            _probe,
+            Y_AXIS,
+            report.y,
+            US_TO_NS(report.timestamp),
+            MODALITY_TAGS("px4", "gyroscope", "sensor", "time"),
+            "Gyroscope y axis");
+    assert(err == 0);
+    err = MODALITY_PROBE_RECORD_W_F32_W_TIME(
+            _probe,
+            Z_AXIS,
+            report.z,
+            US_TO_NS(report.timestamp),
+            MODALITY_TAGS("px4", "gyroscope", "sensor", "time"),
+            "Gyroscope z axis");
+    assert(err == 0);
+
+    size_t snapshot_size = 0;
+    err = modality_probe_produce_snapshot_bytes(
+            _probe,
+            &report.snapshot[0],
+            sizeof(report.snapshot),
+            &snapshot_size);
+    assert(err == MODALITY_PROBE_ERROR_OK);
+
 	_sensor_pub.publish(report);
+
+    const int should_report = update_last_report_time(REPORT_INTERVAL_US_GYROSCOPE, &_last_report_time);
+    if(should_report != 0)
+    {
+        send_probe_report(_probe, _report_socket, _report_buffer, sizeof(_report_buffer));
+    }
 }

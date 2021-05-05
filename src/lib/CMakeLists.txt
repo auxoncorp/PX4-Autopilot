@@ -34,6 +34,7 @@
 px4_add_git_submodule(TARGET git_ecl PATH "ecl")
 px4_add_git_submodule(TARGET git_matrix PATH "matrix")
 
+add_subdirectory(modality_helpers)
 add_subdirectory(airspeed)
 add_subdirectory(airspeed_validator)
 add_subdirectory(avoidance)

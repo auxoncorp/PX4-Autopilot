@@ -37,6 +37,8 @@
 
 #include <float.h>
 
+#include "vehicle_imu_component_definitions.h"
+
 using namespace matrix;
 using namespace time_literals;
 
@@ -72,6 +74,22 @@ VehicleIMU::VehicleIMU(uint8_t accel_index, uint8_t gyro_index) :
 	// advertise immediately to ensure consistent ordering
 	_vehicle_imu_pub.advertise();
 	_vehicle_imu_status_pub.advertise();
+
+    probe_report_socket_init(&_report_socket);
+
+    const size_t err = MODALITY_PROBE_INIT(
+            &_probe_storage[0],
+            sizeof(_probe_storage),
+            PX4_VEHICLE_IMU,
+            PX4_WALL_CLOCK_RESOLUTION_NS,
+            PX4_WALL_CLOCK_ID,
+            &next_persistent_sequence_id,
+            NULL, /* No user data needed for our next_persistent_sequence_id implementation */
+            &_probe,
+            MODALITY_TAGS("px4", "library", "vehicle-imu"),
+            "Vehicle IMU probe");
+    assert(err == MODALITY_PROBE_ERROR_OK);
+    LOG_PROBE_INIT(PX4_VEHICLE_IMU);
 }
 
 VehicleIMU::~VehicleIMU()
@@ -191,6 +209,7 @@ void VehicleIMU::Run()
 
 	ParametersUpdate();
 
+    size_t err;
 	bool sensor_data_gap = false;
 	bool update_integrator_config = false;
 	bool publish_status = false;
@@ -199,6 +218,12 @@ void VehicleIMU::Run()
 	sensor_gyro_s gyro;
 
 	while (_sensor_gyro_sub.update(&gyro)) {
+        err = modality_probe_merge_snapshot_bytes(
+                _probe,
+                &gyro.snapshot[0],
+                sizeof(gyro.snapshot));
+        assert(err == MODALITY_PROBE_ERROR_OK);
+
 		perf_count_interval(_gyro_update_perf, gyro.timestamp_sample);
 
 		if (_sensor_gyro_sub.get_last_generation() != _gyro_last_generation + 1) {
@@ -321,6 +346,22 @@ void VehicleIMU::Run()
 		UpdateIntegratorConfiguration();
 	}
 
+    err = MODALITY_PROBE_RECORD_W_BOOL(
+            _probe,
+            ACCEL_INTEGRATOR_READY,
+            _accel_integrator.integral_ready(),
+            MODALITY_TAGS("px4", "vehicle-imu", "accelerometer"),
+            "Accelerometer integrator ready");
+    assert(err == MODALITY_PROBE_ERROR_OK);
+
+    err = MODALITY_PROBE_RECORD_W_BOOL(
+            _probe,
+            GYRO_INTEGRATOR_READY,
+            _gyro_integrator.integral_ready(),
+            MODALITY_TAGS("px4", "vehicle-imu", "gyroscope"),
+            "Gyroscope integrator ready");
+    assert(err == MODALITY_PROBE_ERROR_OK);
+
 	// publish if both accel & gyro integrators are ready
 	if (_accel_integrator.integral_ready() && _gyro_integrator.integral_ready()) {
 
@@ -366,14 +407,35 @@ void VehicleIMU::Run()
 			imu.delta_velocity_dt = accel_integral_dt;
 			imu.delta_velocity_clipping = _delta_velocity_clipping;
 			imu.timestamp = hrt_absolute_time();
+
+            size_t snapshot_size = 0;
+            err = modality_probe_produce_snapshot_bytes(
+                    _probe,
+                    &imu.snapshot[0],
+                    sizeof(imu.snapshot),
+                    &snapshot_size);
+            assert(err == MODALITY_PROBE_ERROR_OK);
+
 			_vehicle_imu_pub.publish(imu);
 
 			// reset clip counts
 			_delta_velocity_clipping = 0;
 
+            const int should_report = update_last_report_time(REPORT_INTERVAL_US, &_last_report_time);
+            if(should_report != 0)
+            {
+                send_probe_report(_probe, _report_socket, _report_buffer, sizeof(_report_buffer));
+            }
+
 			return;
 		}
 	}
+
+    const int should_report = update_last_report_time(REPORT_INTERVAL_US, &_last_report_time);
+    if(should_report != 0)
+    {
+        send_probe_report(_probe, _report_socket, _report_buffer, sizeof(_report_buffer));
+    }
 }
 
 void VehicleIMU::UpdateIntegratorConfiguration()

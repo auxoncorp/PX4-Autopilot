@@ -64,6 +64,8 @@
 #include <uORB/topics/vehicle_local_position.h>
 #include <uORB/topics/vehicle_status.h>
 
+#include <modality_helpers/modality_helpers.h>
+
 using namespace time_literals;
 
 namespace land_detector
@@ -181,6 +183,12 @@ private:
 		(ParamInt<px4::params::LND_FLIGHT_T_HI>) _param_total_flight_time_high,
 		(ParamInt<px4::params::LND_FLIGHT_T_LO>) _param_total_flight_time_low
 	);
+
+    modality_probe *_probe = MODALITY_PROBE_NULL_INITIALIZER;
+    uint8_t _probe_storage[PROBE_SIZE];
+    uint8_t _report_buffer[REPORT_SIZE];
+    int _report_socket = -1;
+    hrt_abstime _last_report_time = 0;
 };
 
 } // namespace land_detector

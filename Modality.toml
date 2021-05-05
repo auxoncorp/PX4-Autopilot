@@ -1,0 +1,12 @@
+modalityd = "http://localhost:14181/v1/"
+collector_connections = [
+    "udp://127.0.0.1:2718",
+]
+control_connections = [
+    # Battery probe
+    "udp://127.0.0.1:34000",
+    # Gyroscope probe
+    "udp://127.0.0.1:34001",
+]
+[user]
+email = "px4-user"

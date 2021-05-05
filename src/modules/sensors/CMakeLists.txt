@@ -31,6 +31,9 @@
 #
 ############################################################################
 
+# Keep asserts
+add_definitions(-UNDEBUG)
+
 add_subdirectory(data_validator)
 
 add_subdirectory(sensor_calibration) # used by vehicle_{acceleration, angular_velocity, imu}
@@ -59,4 +62,23 @@ px4_add_module(
 		vehicle_air_data
 		vehicle_imu
 		mag_compensation
+        modality_helpers
 	)
+
+modality_probe_generate_manifest(
+    TARGET modules__sensors
+    DEPENDS
+        sensors.cpp
+        voted_sensors_update.cpp
+    COMPONENT_NAME "sensors-component"
+    OUTPUT_PATH "sensors-component"
+    FILE_EXTENSIONS "cpp"
+    EXCLUDES "vehicle_imu"
+    SOURCE_PATH "."
+    )
+
+modality_probe_generate_header(
+    TARGET modules__sensors
+    OUTPUT_FILE "sensors_component_definitions.h"
+    COMPONENT_PATH "sensors-component"
+    )

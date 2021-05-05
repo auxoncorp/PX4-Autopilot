@@ -81,6 +81,11 @@
 
 #include <uORB/topics/mavlink_log.h>
 
+#include <modality_helpers/modality_helpers.h>
+
+#include "commander_probe.h"
+#include "commander_component_definitions.h"
+
 typedef enum VEHICLE_MODE_FLAG {
 	VEHICLE_MODE_FLAG_CUSTOM_MODE_ENABLED = 1, /* 0b00000001 Reserved for future use. | */
 	VEHICLE_MODE_FLAG_TEST_ENABLED = 2, /* 0b00000010 system has a test mode enabled. This flag is intended for temporary system tests and should not be used for stable implementations. | */
@@ -106,6 +111,13 @@ static struct vehicle_status_s status = {};
 static struct actuator_armed_s armed = {};
 
 static struct vehicle_status_flags_s status_flags = {};
+
+/* Global probe used by the commander module and its utilities */
+modality_probe *g_commander_probe = MODALITY_PROBE_NULL_INITIALIZER;
+static uint8_t g_probe_storage[PROBE_SIZE];
+static uint8_t g_report_buffer[REPORT_SIZE];
+static int g_report_socket = -1;
+static hrt_abstime g_last_report_time = 0;
 
 /**
  * Loop that runs at a lower rate and priority for calibration and parameter tasks.
@@ -514,6 +526,23 @@ Commander::Commander() :
 
 	// default for vtol is rotary wing
 	_vtol_status.vtol_in_rw_mode = true;
+
+    probe_report_socket_init(&g_report_socket);
+
+    assert(g_commander_probe == MODALITY_PROBE_NULL_INITIALIZER);
+    const size_t err = MODALITY_PROBE_INIT(
+            &g_probe_storage[0],
+            sizeof(g_probe_storage),
+            PX4_COMMANDER,
+            PX4_WALL_CLOCK_RESOLUTION_NS,
+            PX4_WALL_CLOCK_ID,
+            &next_persistent_sequence_id,
+            NULL, /* No user data needed for our next_persistent_sequence_id implementation */
+            &g_commander_probe,
+            MODALITY_TAGS("px4", "module", "commander"),
+            "Commander probe");
+    assert(err == MODALITY_PROBE_ERROR_OK);
+    LOG_PROBE_INIT(PX4_COMMANDER);
 }
 
 bool
@@ -1252,6 +1281,7 @@ Commander::updateHomePositionYaw(float yaw)
 void
 Commander::run()
 {
+    size_t err;
 	bool sensor_fail_tune_played = false;
 
 	const param_t param_airmode = param_find("MC_AIRMODE");
@@ -1623,11 +1653,23 @@ Commander::run()
 			_was_landed = _land_detector.landed;
 			_land_detector_sub.copy(&_land_detector);
 
+            err = modality_probe_merge_snapshot_bytes(
+                    g_commander_probe,
+                    &_land_detector.snapshot[0],
+                    sizeof(_land_detector.snapshot));
+            assert(err == MODALITY_PROBE_ERROR_OK);
+
 			// Only take actions if armed
 			if (armed.armed) {
 				if (_was_landed != _land_detector.landed) {
 					if (_land_detector.landed) {
 						mavlink_log_info(&mavlink_log_pub, "Landing detected");
+                        err = MODALITY_PROBE_RECORD(
+                                g_commander_probe,
+                                LAND_DETECTED,
+                                MODALITY_TAGS("px4", "commander"),
+                                "Land detected");
+                        assert(err == MODALITY_PROBE_ERROR_OK);
 
 					} else {
 						mavlink_log_info(&mavlink_log_pub, "Takeoff detected");
@@ -1639,6 +1681,13 @@ Commander::run()
 						_gpos_probation_time_us = _param_com_pos_fs_prob.get() * 1_s;
 						_lpos_probation_time_us = _param_com_pos_fs_prob.get() * 1_s;
 						_lvel_probation_time_us = _param_com_pos_fs_prob.get() * 1_s;
+
+                        err = MODALITY_PROBE_RECORD(
+                                g_commander_probe,
+                                TAKEOFF_DETECTED,
+                                MODALITY_TAGS("px4", "commander"),
+                                "Takeoff detected");
+                        assert(err == MODALITY_PROBE_ERROR_OK);
 					}
 				}
 			}
@@ -2503,6 +2552,12 @@ Commander::run()
 		_status_changed = false;
 
 		arm_auth_update(now, params_updated || param_init_forced);
+
+        const int should_report = update_last_report_time(REPORT_INTERVAL_US, &g_last_report_time);
+        if(should_report != 0)
+        {
+            send_probe_report(g_commander_probe, g_report_socket, g_report_buffer, sizeof(g_report_buffer));
+        }
 
 		px4_usleep(COMMANDER_MONITORING_INTERVAL);
 	}
@@ -3964,6 +4019,14 @@ void Commander::battery_status_check()
 		return;
 	}
 
+    /* We've instrumented the simulation battery, single instance */
+    assert(num_connected_batteries == 1);
+    size_t err = modality_probe_merge_snapshot_bytes(
+            g_commander_probe,
+            &batteries[0].snapshot[0],
+            sizeof(batteries[0].snapshot));
+    assert(err == MODALITY_PROBE_ERROR_OK);
+
 	// There are possibly multiple batteries, and we can't know which ones serve which purpose. So the safest
 	// option is to check if ANY of them have a warning, and specifically find which one has the most
 	// urgent warning.
@@ -4006,6 +4069,22 @@ void Commander::battery_status_check()
 	if (update_internal_battery_state) {
 		_battery_warning = worst_warning;
 	}
+
+    err = MODALITY_PROBE_RECORD_W_U8(
+            g_commander_probe,
+            BATTERY_WARNING_LEVEL,
+            _battery_warning,
+            MODALITY_TAGS("px4", "commander", "battery", "power"),
+            "Battery warn level received");
+    assert(err == MODALITY_PROBE_ERROR_OK);
+
+    err = MODALITY_PROBE_RECORD_W_BOOL(
+            g_commander_probe,
+            BATTERY_WARNING_LEVEL_INCREASED_WHILE_ARMED,
+            battery_warning_level_increased_while_armed,
+            MODALITY_TAGS("px4", "commander", "battery", "power"),
+            "Battery warning level increased while armed");
+    assert(err == MODALITY_PROBE_ERROR_OK);
 
 	status_flags.condition_battery_healthy =
 		// All connected batteries are regularly being published

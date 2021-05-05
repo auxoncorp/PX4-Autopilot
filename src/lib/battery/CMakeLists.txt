@@ -31,7 +31,37 @@
 #
 ############################################################################
 
-px4_add_library(battery battery.cpp)
+# Keep asserts
+add_definitions(-UNDEBUG)
+
+px4_add_library(battery battery.cpp generated_mutators/battery_warning_mutator.c)
+
+target_link_libraries(battery PRIVATE modality_helpers)
 
 # TODO: Add an option in px4_add_library function to add module config file
 set_property(GLOBAL APPEND PROPERTY PX4_MODULE_CONFIG_FILES ${CMAKE_CURRENT_SOURCE_DIR}/module.yaml)
+
+modality_probe_generate_manifest(
+    TARGET battery
+    DEPENDS battery.cpp
+    COMPONENT_NAME "battery-component"
+    OUTPUT_PATH "battery-component"
+    EXCLUDES "generated_mutators"
+    FILE_EXTENSIONS "cpp"
+    SOURCE_PATH "."
+    )
+
+modality_probe_generate_header(
+    TARGET battery
+    OUTPUT_FILE "battery_component_definitions.h"
+    COMPONENT_PATH "battery-component"
+    )
+
+modality_probe_generate_mutators(
+    TARGET battery
+    DEPENDS battery.cpp
+    FILE_EXTENSIONS "cpp"
+    COMPONENT_PATH "battery-component"
+    OUTPUT_PATH "generated_mutators"
+    SOURCE_PATH "."
+    )

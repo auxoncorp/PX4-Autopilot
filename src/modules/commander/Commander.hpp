@@ -82,6 +82,8 @@
 #include <uORB/topics/vehicle_local_position.h>
 #include <uORB/topics/vtol_vehicle_status.h>
 
+#include <modality_helpers/modality_helpers.h>
+
 using math::constrain;
 using systemlib::Hysteresis;
 
@@ -435,7 +437,6 @@ private:
 	uORB::PublicationData<home_position_s>			_home_pub{ORB_ID(home_position)};
 
 	uORB::PublicationQueued<vehicle_command_ack_s>		_command_ack_pub{ORB_ID(vehicle_command_ack)};
-
 };
 
 #endif /* COMMANDER_HPP_ */

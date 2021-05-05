@@ -46,6 +46,8 @@
 #include <uORB/topics/sensor_accel.h>
 #include <uORB/topics/sensor_gyro.h>
 
+#include "sensors_probe.h"
+
 #define MAG_ROT_VAL_INTERNAL		-1
 #define CAL_ERROR_APPLY_CAL_MSG "FAILED APPLYING %s CAL #%u"
 
@@ -130,7 +132,9 @@ void VotedSensorsUpdate::parametersUpdate()
 			if (_gyro.priority[uorb_index] == ORB_PRIO_UNINITIALIZED) {
 				// find corresponding sensor_gyro publication
 				for (uint8_t i = 0; i < GYRO_COUNT_MAX; i++) {
-					uORB::SubscriptionData<sensor_accel_s> sensor_gyro{ORB_ID(sensor_gyro), i};
+                    /* Fixed in 27f23ac290e3fbfc3d28c08bfd535c12eb42eebf */
+					/* uORB::SubscriptionData<sensor_accel_s> sensor_gyro{ORB_ID(sensor_gyro), i}; */
+					uORB::SubscriptionData<sensor_gyro_s> sensor_gyro{ORB_ID(sensor_gyro), i};
 					sensor_gyro.update();
 
 					if (imu.get().gyro_device_id == sensor_gyro.get().device_id) {
@@ -302,6 +306,11 @@ void VotedSensorsUpdate::imuPoll(struct sensor_combined_s &raw)
 		vehicle_imu_s imu_report;
 
 		if (_accel.enabled[uorb_index] && _gyro.enabled[uorb_index] && _vehicle_imu_sub[uorb_index].update(&imu_report)) {
+            const size_t err = modality_probe_merge_snapshot_bytes(
+                    g_sensors_probe,
+                    &imu_report.snapshot[0],
+                    sizeof(imu_report.snapshot));
+            assert(err == MODALITY_PROBE_ERROR_OK);
 
 			// copy corresponding vehicle_imu_status for accel & gyro error counts
 			vehicle_imu_status_s imu_status{};

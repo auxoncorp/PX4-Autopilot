@@ -1,0 +1,25 @@
+component_id,id,name,description,tags,type_hint,file,line
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,1073741822,MODALITY_PRODUCED_EXTERNAL_REPORT,The probe produced a log report for transmission to the backend for external analysis,INTERNAL,,,
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,1073741821,MODALITY_LOG_ITEMS_MISSED,"Some log items were overwritten without successfully getting reported to the collector, the number of missed entries is storedin the payload",INTERNAL,u32,,
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,1073741820,MODALITY_LOGICAL_CLOCK_OVERFLOWED,A logical clock's count reached the maximum trackable value,INTERNAL,u32,,
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,1073741819,MODALITY_NUM_CLOCKS_OVERFLOWED,The probe did not have enough memory reserved to store enough logical clocks to track all of the unique neighbors that attempt to communicate with it,INTERNAL,,,
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,1073741818,MODALITY_INSUFFICIENT_REPORT_BUFFER_SIZE,The report destination buffer is too small to fit a header and/or the frontier clocks,INTERNAL,,,
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,1073741817,MODALITY_PROBE_INITIALIZED,The probe successfully initialized itself,INTERNAL,,,
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,1073741816,MODALITY_INVALID_NEXT_EPOCH_SEQ_ID,"The probe is configured to track restarts, but the user's implementation returned an invalid zero value or a None option variant.",INTERNAL,,,
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,1073741815,MODALITY_WALL_CLOCK_TIME_ONLY,Reserved for indicating wall clock time,INTERNAL,,,
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,1073741694,MODALITY_MUTATION_INJECTION_TRIGGERED,Mutation injection triggered,INTERNAL,u32,,
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,1073741693,MODALITY_MUTATION_INJECTION_SUCCESS,Mutation injection succeeded,INTERNAL,u32,,
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,1073741692,MODALITY_MUTATION_INJECTION_ERROR,Mutation injection failed,INTERNAL,u32,,
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,1073741691,MODALITY_SCOPE_BEGIN,Modulus stimulus scope began,INTERNAL,u32,,
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,1073741690,MODALITY_SCOPE_END,Modulus stimulus scope ended,INTERNAL,u32,,
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,1073741689,DYNAMIC_EXPECTATION,Modulus stimulus dynamic expectation,INTERNAL,u32,,
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,1073741688,MODALITY_CONTROL_MSG_DROPPED,Modulus control message dropped,INTERNAL,u32,,
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,1073741687,MODALITY_TRIGGER_DROPPED,Modulus trigger control block dropped,INTERNAL,u32,,
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,1073741686,MODALITY_MUTATION_EPOCH_ADVANCED,Mutation epoch advanced,INTERNAL,u16,,
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,1,STATE_RESET,Battery reset it's state,px4;battery;power,,battery/battery.cpp,143
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,2,RAW_VOLTAGE,Battery sampled raw voltage,px4;battery;power;time,f32,battery/battery.cpp,169
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,3,FILTERED_VOLTAGE,Battery filtered voltage,px4;battery;voltage;power;time,f32,battery/battery.cpp,185
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,4,CONNECTED,Battery connected state,px4;battery;power,bool,battery/battery.cpp,194
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,5,WARNING_LEVEL,Battery warning level,px4;battery;power,u8,battery/battery.cpp,223
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,6,WARNING_LEVEL_OK,Battery nominal voltage check,EXPECTATION;SEVERITY_8;px4;battery;power,u32,battery/battery.cpp,231
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,7,EMERGENCY_WARNING_LEVEL,Battery emergency warning level,FAILURE;SEVERITY_10;px4;battery;power,,battery/battery.cpp,353

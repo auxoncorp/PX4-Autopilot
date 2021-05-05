@@ -11,4 +11,6 @@ float32 temperature       # temperature in degrees celsius
 
 uint32 error_count
 
+uint8[12] snapshot        # Modality probe causal snapshot
+
 uint8 ORB_QUEUE_LENGTH = 8

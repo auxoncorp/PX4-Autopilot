@@ -15,3 +15,5 @@ uint8 CLIPPING_X = 1
 uint8 CLIPPING_Y = 2
 uint8 CLIPPING_Z = 4
 uint8 delta_velocity_clipping   # bitfield indicating if there was any accelerometer clipping (per axis) during the integration time frame
+
+uint8[12] snapshot              # Modality probe causal snapshot

@@ -82,6 +82,10 @@
 
 #include "Utility/PreFlightChecker.hpp"
 
+#include <modality_helpers/modality_helpers.h>
+
+#include "ekf2_component_definitions.h"
+
 // defines used to specify the mask position for use of different accuracy metrics in the GPS blending algorithm
 #define BLEND_MASK_USE_SPD_ACC      1
 #define BLEND_MASK_USE_HPOS_ACC     2
@@ -539,6 +543,11 @@ private:
 
 	)
 
+    modality_probe *_probe = MODALITY_PROBE_NULL_INITIALIZER;
+    uint8_t _probe_storage[PROBE_SIZE];
+    uint8_t _report_buffer[REPORT_SIZE];
+    int _report_socket = -1;
+    hrt_abstime _last_report_time = 0;
 };
 
 Ekf2::Ekf2(bool replay_mode):
@@ -655,6 +664,22 @@ Ekf2::Ekf2(bool replay_mode):
 	updateParams();
 
 	_ekf.set_min_required_gps_health_time(_param_ekf2_req_gps_h.get() * 1_s);
+
+    probe_report_socket_init(&_report_socket);
+
+    const size_t err = MODALITY_PROBE_INIT(
+            &_probe_storage[0],
+            sizeof(_probe_storage),
+            PX4_EKF2,
+            PX4_WALL_CLOCK_RESOLUTION_NS,
+            PX4_WALL_CLOCK_ID,
+            &next_persistent_sequence_id,
+            NULL, /* No user data needed for our next_persistent_sequence_id implementation */
+            &_probe,
+            MODALITY_TAGS("px4", "module", "ekf2"),
+            "EKF2 probe");
+    assert(err == MODALITY_PROBE_ERROR_OK);
+    LOG_PROBE_INIT(PX4_EKF2);
 }
 
 Ekf2::~Ekf2()
@@ -763,6 +788,7 @@ void Ekf2::Run()
 		return;
 	}
 
+    size_t err;
 	bool updated = false;
 	imuSample imu_sample_new {};
 
@@ -772,6 +798,14 @@ void Ekf2::Run()
 	if (_imu_sub_index >= 0) {
 		vehicle_imu_s imu;
 		updated = _vehicle_imu_subs[_imu_sub_index].update(&imu);
+        if(updated)
+        {
+            err = modality_probe_merge_snapshot_bytes(
+                    _probe,
+                    &imu.snapshot[0],
+                    sizeof(imu.snapshot));
+            assert(err == MODALITY_PROBE_ERROR_OK);
+        }
 
 		imu_sample_new.time_us = imu.timestamp_sample;
 		imu_sample_new.delta_ang_dt = imu.delta_angle_dt * 1.e-6f;
@@ -793,6 +827,14 @@ void Ekf2::Run()
 	} else {
 		sensor_combined_s sensor_combined;
 		updated = _sensor_combined_sub.update(&sensor_combined);
+        if(updated)
+        {
+            err = modality_probe_merge_snapshot_bytes(
+                    _probe,
+                    &sensor_combined.snapshot[0],
+                    sizeof(sensor_combined.snapshot));
+            assert(err == MODALITY_PROBE_ERROR_OK);
+        }
 
 		imu_sample_new.time_us = sensor_combined.timestamp;
 		imu_sample_new.delta_ang_dt = sensor_combined.gyro_integral_dt * 1.e-6f;
@@ -822,6 +864,14 @@ void Ekf2::Run()
 		}
 
 		const hrt_abstime now = imu_sample_new.time_us;
+
+        err = MODALITY_PROBE_RECORD_W_TIME(
+                _probe,
+                UPDATE_BEGIN,
+                US_TO_NS(now),
+                MODALITY_TAGS("px4", "ekf2", "time"),
+                "EKF2 update loop begin");
+        assert(err == MODALITY_PROBE_ERROR_OK);        
 
 		// ekf2_timestamps (using 0.1 ms relative timestamps)
 		ekf2_timestamps_s ekf2_timestamps{};
@@ -1745,6 +1795,12 @@ void Ekf2::Run()
 
 		px4_lockstep_progress(_lockstep_component);
 	}
+
+    const int should_report = update_last_report_time(REPORT_INTERVAL_US, &_last_report_time);
+    if(should_report != 0)
+    {
+        send_probe_report(_probe, _report_socket, _report_buffer, sizeof(_report_buffer));
+    }
 }
 
 void Ekf2::fillGpsMsgWithVehicleGpsPosData(gps_message &msg, const vehicle_gps_position_s &data)
@@ -1817,6 +1873,14 @@ void Ekf2::publish_attitude(const hrt_abstime &timestamp)
 		q.copyTo(att.q);
 
 		_ekf.get_quat_reset(&att.delta_q_reset[0], &att.quat_reset_counter);
+
+        size_t snapshot_size = 0;
+        const size_t err = modality_probe_produce_snapshot_bytes(
+                _probe,
+                &att.snapshot[0],
+                sizeof(att.snapshot),
+                &snapshot_size);
+        assert(err == MODALITY_PROBE_ERROR_OK);
 
 		_att_pub.publish(att);
 

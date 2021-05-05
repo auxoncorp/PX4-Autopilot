@@ -1,0 +1,14 @@
+name = "gyroscope-mutator"
+tags = ["gyroscope", "px4"]
+source_file = "PX4Gyroscope.cpp"
+source_line = 163
+
+[[params]]
+name = "z-axis"
+type = "F32"
+
+[params.constraints]
+minimum_effect_value = 0.0
+nominal_range = [-34.90659, 34.90659]
+safety_range = [-34.90659, 34.90659]
+hard_range = [-34.90659, 34.90659]

@@ -40,6 +40,9 @@
 
 #include "FailureDetector.hpp"
 
+#include "../commander_probe.h"
+#include "../commander_component_definitions.h"
+
 using namespace time_literals;
 
 FailureDetector::FailureDetector(ModuleParams *parent) :
@@ -57,6 +60,14 @@ bool FailureDetector::resetAttitudeStatus()
 		_status &= ~attitude_fields_bitmask;
 		status_changed = true;
 	}
+
+    const size_t err = MODALITY_PROBE_RECORD_W_BOOL(
+            g_commander_probe,
+            FAILURE_DETECTOR_RESET_ATTITUDE_STATUS,
+            status_changed,
+            MODALITY_TAGS("px4", "commander", "failure-detector"),
+            "Failure detector reset attitude status");
+    assert(err == MODALITY_PROBE_ERROR_OK);
 
 	return status_changed;
 }
@@ -86,6 +97,14 @@ FailureDetector::update(const vehicle_status_s &vehicle_status)
 
 	}
 
+    const size_t err = MODALITY_PROBE_RECORD_W_BOOL(
+            g_commander_probe,
+            FAILURE_DETECTOR_UPDATED,
+            updated, /* Log status_changed */
+            MODALITY_TAGS("px4", "commander", "failure-detector"),
+            "Failure detector updated");
+    assert(err == MODALITY_PROBE_ERROR_OK);
+
 	return updated;
 }
 
@@ -106,16 +125,31 @@ FailureDetector::isAttitudeStabilized(const vehicle_status_s &vehicle_status)
 					  nav_state != vehicle_status_s::NAVIGATION_STATE_RATTITUDE;
 	}
 
+    const size_t err = MODALITY_PROBE_RECORD_W_BOOL_W_TIME(
+            g_commander_probe,
+            FAILURE_DETECTOR_ATTITUDE_STABLE,
+            attitude_is_stabilized,
+            hrt_time_ns(),
+            MODALITY_TAGS("px4", "commander", "failure-detector", "time"),
+            "Failure detector attitude stabilized updated");
+    assert(err == MODALITY_PROBE_ERROR_OK);
+
 	return attitude_is_stabilized;
 }
 
 bool
 FailureDetector::updateAttitudeStatus()
 {
+    size_t err;
 	bool updated(false);
 	vehicle_attitude_s attitude;
 
 	if (_sub_vehicule_attitude.update(&attitude)) {
+        err = modality_probe_merge_snapshot_bytes(
+                g_commander_probe,
+                &attitude.snapshot[0],
+                sizeof(attitude.snapshot));
+        assert(err == MODALITY_PROBE_ERROR_OK);
 
 		const matrix::Eulerf euler(matrix::Quatf(attitude.q));
 		const float roll(euler.phi());
@@ -147,6 +181,26 @@ FailureDetector::updateAttitudeStatus()
 		if (_pitch_failure_hysteresis.get_state()) {
 			_status |= FAILURE_PITCH;
 		}
+
+        err = MODALITY_PROBE_EXPECT_W_TIME(
+                g_commander_probe,
+                FAILURE_DETECTOR_STATUS_ROLL_ASSERTED,
+                (_status & FAILURE_ROLL) == 0,
+                hrt_time_ns(),
+                MODALITY_TAGS("px4", "commander", "failure-detector", "time"),
+                MODALITY_SEVERITY(10),
+                "Failure detector status roll asserted");
+        assert(err == MODALITY_PROBE_ERROR_OK);
+
+        err = MODALITY_PROBE_EXPECT_W_TIME(
+                g_commander_probe,
+                FAILURE_DETECTOR_STATUS_PITCH_ASSERTED,
+                (_status & FAILURE_PITCH) == 0,
+                hrt_time_ns(),
+                MODALITY_TAGS("px4", "commander", "failure-detector", "time"),
+                MODALITY_SEVERITY(10),
+                "Failure detector status pitch asserted");
+        assert(err == MODALITY_PROBE_ERROR_OK);
 
 		updated = true;
 	}

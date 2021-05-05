@@ -30,6 +30,10 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 ############################################################################
+
+# Keep asserts
+add_definitions(-UNDEBUG)
+
 px4_add_module(
 	MODULE modules__land_detector
 	MAIN land_detector
@@ -44,5 +48,20 @@ px4_add_module(
 		AirshipLandDetector.cpp
 	DEPENDS
 		hysteresis
+        modality_helpers
 	)
 
+modality_probe_generate_manifest(
+    TARGET modules__land_detector
+    DEPENDS LandDetector.cpp
+    COMPONENT_NAME "land-detector-component"
+    OUTPUT_PATH "land-detector-component"
+    FILE_EXTENSIONS "cpp"
+    SOURCE_PATH "."
+    )
+
+modality_probe_generate_header(
+    TARGET modules__land_detector
+    OUTPUT_FILE "land_detector_component_definitions.h"
+    COMPONENT_PATH "land-detector-component"
+    )

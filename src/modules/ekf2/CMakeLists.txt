@@ -31,6 +31,9 @@
 #
 #############################################################################
 
+# Keep asserts
+add_definitions(-UNDEBUG)
+
 add_subdirectory(Utility)
 
 px4_add_module(
@@ -46,4 +49,20 @@ px4_add_module(
 		ecl_geo
 		perf
 		Ekf2Utility
+        modality_helpers
 	)
+
+modality_probe_generate_manifest(
+    TARGET modules__ekf2
+    DEPENDS ekf2_main.cpp
+    COMPONENT_NAME "ekf2-component"
+    OUTPUT_PATH "ekf2-component"
+    FILE_EXTENSIONS "cpp"
+    SOURCE_PATH "."
+    )
+
+modality_probe_generate_header(
+    TARGET modules__ekf2
+    OUTPUT_FILE "ekf2_component_definitions.h"
+    COMPONENT_PATH "ekf2-component"
+    )

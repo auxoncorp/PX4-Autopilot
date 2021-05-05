@@ -31,6 +31,9 @@
 #
 ############################################################################
 
+# Keep asserts
+add_definitions(-UNDEBUG)
+
 add_subdirectory(failure_detector)
 add_subdirectory(Arming)
 
@@ -59,6 +62,24 @@ px4_add_module(
 		ArmAuthorization
 		HealthFlags
 	)
+
+modality_probe_generate_manifest(
+    TARGET modules__commander
+    DEPENDS
+        Commander.cpp
+        failure_detector/FailureDetector.cpp
+        state_machine_helper.cpp
+    COMPONENT_NAME "commander-component"
+    OUTPUT_PATH "commander-component"
+    FILE_EXTENSIONS "cpp"
+    SOURCE_PATH "."
+    )
+
+modality_probe_generate_header(
+    TARGET modules__commander
+    OUTPUT_FILE "commander_component_definitions.h"
+    COMPONENT_PATH "commander-component"
+    )
 
 if(PX4_TESTING)
 	add_subdirectory(commander_tests)
