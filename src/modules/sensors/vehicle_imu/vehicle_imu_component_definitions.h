@@ -4,8 +4,8 @@
  * Component:
  *   Name: vehicle-imu-component
  *   ID: dfa99a06-2d09-4d0b-a185-30812de2a8a4
- *   Code hash: a27f31626df05409d36afbadf63d8953bde123d8f4819330e6529bf431be2775
- *   Instrumentation hash: ebe7bbf89d33f29f35f341f4c7b96db961c9a98c646d13236f7ee6bc14b296bb
+ *   Code hash: 75aa737526e1089ad35b3ed10143621bdb643cf63e3208c6cc0a1e27d1e3c7b6
+ *   Instrumentation hash: daf1917518c79cfa7587ba1b25f487376369733707e2ee49a1e254022b9ae434
  */
 
 #ifndef MODALITY_PROBE_GENERATED_IDENTIFIERS_H
@@ -29,18 +29,8 @@ extern "C" {
 #define PX4_VEHICLE_IMU (724167641UL)
 
 /*
- * Events (sha3-256 a089f109842ef9d0c75020916e6f4da1ac9533c59603670b8df7b6d559798ff1)
+ * Events (sha3-256 1f136588ab8bc4674753ddf9b989e1ca3bad127f9b0d55ebeeb8bec909070c46)
  */
-
-/*
- * Name: ACCEL_INTEGRATOR_READY
- * Description: Accelerometer integrator ready
- * Component ID: dfa99a06-2d09-4d0b-a185-30812de2a8a4
- * Tags: px4;vehicle-imu;accelerometer
- * Payload type: bool
- * Location: vehicle_imu/VehicleIMU.cpp:349
- */
-#define ACCEL_INTEGRATOR_READY (1UL)
 
 /*
  * Name: GYRO_INTEGRATOR_READY
@@ -50,7 +40,7 @@ extern "C" {
  * Payload type: bool
  * Location: vehicle_imu/VehicleIMU.cpp:357
  */
-#define GYRO_INTEGRATOR_READY (2UL)
+#define GYRO_INTEGRATOR_READY (1UL)
 
 #ifdef __cplusplus
 } /* extern "C" */

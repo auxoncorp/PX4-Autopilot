@@ -89,7 +89,8 @@ modality_probe *g_sensors_probe = MODALITY_PROBE_NULL_INITIALIZER;
 static uint8_t g_probe_storage[PROBE_SIZE];
 static uint8_t g_report_buffer[REPORT_SIZE];
 static int g_report_socket = -1;
-static hrt_abstime g_last_report_time = 0;
+static struct hrt_call g_report_call;
+static px4::atomic_bool g_send_report;
 
 using namespace sensors;
 using namespace time_literals;
@@ -251,6 +252,15 @@ Sensors::Sensors(bool hil_enabled) :
             "Sensors probe");
     assert(err == MODALITY_PROBE_ERROR_OK);
     LOG_PROBE_INIT(PX4_SENSORS);
+
+    g_send_report.store(false);
+    hrt_call_init(&g_report_call);
+    hrt_call_every(
+            &g_report_call,
+            0,
+            REPORT_INTERVAL_US,
+            (hrt_callout) &set_atomic_bool,
+            &g_send_report);
 }
 
 Sensors::~Sensors()
@@ -451,13 +461,6 @@ void Sensors::adc_poll()
 	}
 
 #endif /* ADC_AIRSPEED_VOLTAGE_CHANNEL */
-
-    const size_t err = MODALITY_PROBE_RECORD(
-            g_sensors_probe,
-            ADC_POLLED,
-            MODALITY_TAGS("px4", "sensors", "adc"),
-            "ADC polled");
-    assert(err == MODALITY_PROBE_ERROR_OK);
 }
 
 void Sensors::InitializeVehicleAirData()
@@ -636,10 +639,15 @@ void Sensors::Run()
 		parameter_update_poll();
 	}
 
-    const int should_report = update_last_report_time(REPORT_INTERVAL_US, &g_last_report_time);
-    if(should_report != 0)
+    if(g_send_report.load() == true)
     {
-        send_probe_report(g_sensors_probe, g_report_socket, g_report_buffer, sizeof(g_report_buffer));
+        g_send_report.store(false);
+        send_probe_report(
+                g_sensors_probe,
+                g_report_socket,
+                COLLECTOR_PORT_F,
+                g_report_buffer,
+                sizeof(g_report_buffer));
     }
 
 	perf_end(_loop_perf);

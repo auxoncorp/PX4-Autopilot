@@ -28,14 +28,11 @@ extern "C" {
 /* Microseconds to nanoseconds */
 #define US_TO_NS(us) (us * 1000UL)
 
-/* Probe log storage size in bytes */
-#define PROBE_SIZE (1300)
+/* Probe log storage size in bytes, can afford to use large buffers since we're running in the POSIX/SITL environment */
+#define PROBE_SIZE (2048)
 
-/* 1,400 byte report buffers, for sending over UDP socket */
+/* 1,400 byte report buffers, for sending over UDP socket, will typically be in the range of 100~400 bytes */
 #define REPORT_SIZE (1400)
-
-/* Reserve a portion of the report buffer for mutator announcements */
-#define ANNOUNCEMENT_RESERVATION_SIZE (64)
 
 /* Instrumentation uses the single high-resolution timer (hrt_abstime, microseconds) time domain */
 #define PX4_WALL_CLOCK_ID (1)
@@ -43,21 +40,30 @@ extern "C" {
 
 /* Modalityd's UDP collector address that receives probe reports, see Modality.toml */
 #define COLLECTOR_ADDRESS "127.0.0.1"
-#define COLLECTOR_PORT (2718)
+#define COLLECTOR_PORT_A (2710)
+#define COLLECTOR_PORT_B (2711)
+#define COLLECTOR_PORT_C (2712)
+#define COLLECTOR_PORT_D (2713)
+#define COLLECTOR_PORT_E (2714)
+#define COLLECTOR_PORT_F (2715)
+#define COLLECTOR_PORT_G (2716)
 
-/* Probes will send reports every ~25 ms by default, some probes will use their own reporting cadence */
+/* Send probe reports every ~25ms */
 #define REPORT_INTERVAL_US (25UL * 1000UL)
-#define REPORT_INTERVAL_US_GYROSCOPE (20UL * 1000UL)
+
+/* Send mutator announcements every 2s */
+#define MUTATOR_ANNOUNCEMENT_INTERVAL_US (2000UL * 1000UL)
+
+/* Log some of the high-rate signal events periodically */
+#define SAMPLE_LOG_INTERVAL_US (100UL * 1000UL)
 
 /* Control message receivers, see Modality.toml */
 #define UDP_CONTROL_RECVR_BATTERY "127.0.0.1:34000"
 #define UDP_CONTROL_RECVR_GYROSCOPE "127.0.0.1:34001"
 
 /* Helper and utility functions */
+void set_atomic_bool(void *data);
 uint64_t hrt_time_ns(void);
-int update_last_report_time(
-        const hrt_abstime report_interval,
-        hrt_abstime * const last_report_time);
 void probe_report_socket_init(
         int * const report_socket);
 void probe_report_socket_deinit(
@@ -73,6 +79,13 @@ void control_msg_callback(
 void send_probe_report(
         modality_probe * const probe,
         const int socket_fd,
+        const uint16_t port,
+        uint8_t * const buffer,
+        const size_t buffer_size);
+void send_mutator_announcement(
+        modality_probe * const probe,
+        const int socket_fd,
+        const uint16_t port,
         uint8_t * const buffer,
         const size_t buffer_size);
 

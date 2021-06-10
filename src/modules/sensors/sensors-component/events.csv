@@ -16,5 +16,4 @@ component_id,id,name,description,tags,type_hint,file,line
 81e416a3-7250-47d4-9c24-3b6f1c6fbcdc,1073741688,MODALITY_CONTROL_MSG_DROPPED,Modulus control message dropped,INTERNAL,u32,,
 81e416a3-7250-47d4-9c24-3b6f1c6fbcdc,1073741687,MODALITY_TRIGGER_DROPPED,Modulus trigger control block dropped,INTERNAL,u32,,
 81e416a3-7250-47d4-9c24-3b6f1c6fbcdc,1073741686,MODALITY_MUTATION_EPOCH_ADVANCED,Mutation epoch advanced,INTERNAL,u16,,
-81e416a3-7250-47d4-9c24-3b6f1c6fbcdc,1,ADC_POLLED,ADC polled,px4;sensors;adc,,sensors/sensors.cpp,455
-81e416a3-7250-47d4-9c24-3b6f1c6fbcdc,2,SENSORS_POLLED,Sensors polled,px4;sensors,,sensors/sensors.cpp,581
+81e416a3-7250-47d4-9c24-3b6f1c6fbcdc,1,SENSORS_POLLED,Sensors polled,px4;sensors,,sensors/sensors.cpp,584

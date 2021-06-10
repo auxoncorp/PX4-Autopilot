@@ -16,12 +16,20 @@
 #include <modality/probe.h>
 
 #include <drivers/drv_hrt.h>
+#include <px4_platform_common/atomic.h>
 
 #include "modality_helpers.h"
 
 #ifndef MODALITY_PERSISTENT_EPOCH_CACHE_DIR
 #error "Missing definition MODALITY_PERSISTENT_EPOCH_CACHE_DIR"
 #endif
+
+void set_atomic_bool(void *data)
+{
+    assert(data != NULL);
+    px4::atomic_bool * const b = (px4::atomic_bool*) data;
+    (*b).store(true);
+}
 
 uint64_t hrt_time_ns(void)
 {
@@ -30,22 +38,6 @@ uint64_t hrt_time_ns(void)
     /* Modality probe wall clock time values are 61 bits, make sure the reserved upper bits are clear */
     assert((ns & 0xE000000000000000) == 0);
     return ns;
-}
-
-int update_last_report_time(
-        const hrt_abstime report_interval,
-        hrt_abstime * const last_report_time)
-{
-    int should_send_report = 0;
-    const hrt_abstime now = hrt_absolute_time();
-    assert(last_report_time != NULL);
-    assert(now >= *last_report_time);
-    if((now - *last_report_time) >= report_interval)
-    {
-        *last_report_time = now;
-        should_send_report = 1;
-    }
-    return should_send_report;
 }
 
 void probe_report_socket_init(
@@ -155,46 +147,65 @@ void control_msg_callback(
 void send_probe_report(
         modality_probe * const probe,
         const int socket_fd,
+        const uint16_t port,
         uint8_t * const buffer,
         const size_t buffer_size)
 {
     size_t report_size;
-
     struct sockaddr_in collector_addr = {0};
     collector_addr.sin_family = AF_INET;
-    collector_addr.sin_port = htons(COLLECTOR_PORT);
+    collector_addr.sin_port = htons(port);
     collector_addr.sin_addr.s_addr = inet_addr(COLLECTOR_ADDRESS);
 
-    assert(buffer_size >= REPORT_SIZE);
     size_t err = modality_probe_report(
             probe,
             &buffer[0],
-            buffer_size - ANNOUNCEMENT_RESERVATION_SIZE,
+            buffer_size,
             &report_size);
     assert(err == MODALITY_PROBE_ERROR_OK);
 
     if(report_size != 0)
     {
-        /* Tack on a mutator announcement if there are report bytes to send */
-        size_t announcement_size;
-        err = modality_probe_announce_mutators(
-                probe,
-                &buffer[report_size],
-                buffer_size - report_size,
-                &announcement_size);
-        assert(err == MODALITY_PROBE_ERROR_OK);
-
-        const size_t total_size = report_size + announcement_size;
-        assert(total_size != 0);
-        assert(total_size <= buffer_size);
-
         const ssize_t status = sendto(
                 socket_fd,
                 (const char*) &buffer[0],
-                total_size,
+                report_size,
                 0,
                 (const struct sockaddr*) &collector_addr,
                 sizeof(collector_addr));
-        assert(status != -1);
+        assert(status == (ssize_t) report_size);
+    }
+}
+
+void send_mutator_announcement(
+        modality_probe * const probe,
+        const int socket_fd,
+        const uint16_t port,
+        uint8_t * const buffer,
+        const size_t buffer_size)
+{
+    size_t announcement_size;
+    struct sockaddr_in collector_addr = {0};
+    collector_addr.sin_family = AF_INET;
+    collector_addr.sin_port = htons(port);
+    collector_addr.sin_addr.s_addr = inet_addr(COLLECTOR_ADDRESS);
+
+    const size_t err = modality_probe_announce_mutators(
+            probe,
+            &buffer[0],
+            buffer_size,
+            &announcement_size);
+    assert(err == MODALITY_PROBE_ERROR_OK);
+
+    if(announcement_size != 0)
+    {
+        const ssize_t status = sendto(
+                socket_fd,
+                (const char*) &buffer[0],
+                announcement_size,
+                0,
+                (const struct sockaddr*) &collector_addr,
+                sizeof(collector_addr));
+        assert(status == (ssize_t) announcement_size);
     }
 }

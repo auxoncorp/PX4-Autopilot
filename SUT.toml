@@ -1,6 +1,7 @@
 name = "px4"
 tags = ["px4", "drone"]
 component_paths = [
+    "Tools/sitl_gazebo/gazebo-component",
     "src/lib/battery/battery-component",
     "src/modules/land_detector/land-detector-component",
     "src/lib/drivers/gyroscope/gyroscope-component",

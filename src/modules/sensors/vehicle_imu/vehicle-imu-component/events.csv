@@ -16,5 +16,4 @@ dfa99a06-2d09-4d0b-a185-30812de2a8a4,1073741689,DYNAMIC_EXPECTATION,Modulus stim
 dfa99a06-2d09-4d0b-a185-30812de2a8a4,1073741688,MODALITY_CONTROL_MSG_DROPPED,Modulus control message dropped,INTERNAL,u32,,
 dfa99a06-2d09-4d0b-a185-30812de2a8a4,1073741687,MODALITY_TRIGGER_DROPPED,Modulus trigger control block dropped,INTERNAL,u32,,
 dfa99a06-2d09-4d0b-a185-30812de2a8a4,1073741686,MODALITY_MUTATION_EPOCH_ADVANCED,Mutation epoch advanced,INTERNAL,u16,,
-dfa99a06-2d09-4d0b-a185-30812de2a8a4,1,ACCEL_INTEGRATOR_READY,Accelerometer integrator ready,px4;vehicle-imu;accelerometer,bool,vehicle_imu/VehicleIMU.cpp,349
-dfa99a06-2d09-4d0b-a185-30812de2a8a4,2,GYRO_INTEGRATOR_READY,Gyroscope integrator ready,px4;vehicle-imu;gyroscope,bool,vehicle_imu/VehicleIMU.cpp,357
+dfa99a06-2d09-4d0b-a185-30812de2a8a4,1,GYRO_INTEGRATOR_READY,Gyroscope integrator ready,px4;vehicle-imu;gyroscope,bool,vehicle_imu/VehicleIMU.cpp,357

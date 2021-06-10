@@ -84,6 +84,30 @@ PX4Gyroscope::PX4Gyroscope(uint32_t device_id, ORB_PRIO priority, enum Rotation 
             "Gyroscope probe");
     assert(err == MODALITY_PROBE_ERROR_OK);
     LOG_PROBE_INIT_W_RECVR(PX4_GYROSCOPE, UDP_CONTROL_RECVR_GYROSCOPE);
+
+    hrt_call_init(&_report_call);
+    hrt_call_every(
+            &_report_call,
+            0,
+            REPORT_INTERVAL_US,
+            (hrt_callout) &set_atomic_bool,
+            &_send_report);
+
+    hrt_call_init(&_mutator_announcement_call);
+    hrt_call_every(
+            &_mutator_announcement_call,
+            0,
+            MUTATOR_ANNOUNCEMENT_INTERVAL_US,
+            (hrt_callout) &set_atomic_bool,
+            &_send_mutator_announcement);
+
+    hrt_call_init(&_log_data_call);
+    hrt_call_every(
+            &_log_data_call,
+            0,
+            SAMPLE_LOG_INTERVAL_US,
+            (hrt_callout) &set_atomic_bool,
+            &_log_data);
 }
 
 PX4Gyroscope::~PX4Gyroscope()
@@ -143,8 +167,21 @@ void PX4Gyroscope::updateFIFO(sensor_gyro_fifo_s &sample)
 	}
 }
 
+void PX4Gyroscope::merge_snapshot(const uint8_t * const snapshot, const size_t snapshot_size)
+{
+    assert(_probe != NULL);
+    assert(snapshot != NULL);
+    const size_t err = modality_probe_merge_snapshot_bytes(
+            _probe,
+            snapshot,
+            snapshot_size);
+    assert(err == 0);
+}
+
 void PX4Gyroscope::Publish(const hrt_abstime &timestamp_sample, float x, float y, float z)
 {
+    size_t err;
+
 	// Apply rotation (before scaling)
 	rotate_3f(_rotation, x, y, z);
 
@@ -174,30 +211,34 @@ void PX4Gyroscope::Publish(const hrt_abstime &timestamp_sample, float x, float y
             sizeof(report.z),
             MODALITY_TAGS("px4", "gyroscope"));
 
-    size_t err = MODALITY_PROBE_RECORD_W_F32_W_TIME(
-            _probe,
-            X_AXIS,
-            report.x,
-            US_TO_NS(report.timestamp),
-            MODALITY_TAGS("px4", "gyroscope", "sensor", "time"),
-            "Gyroscope x axis");
-    assert(err == 0);
-    err = MODALITY_PROBE_RECORD_W_F32_W_TIME(
-            _probe,
-            Y_AXIS,
-            report.y,
-            US_TO_NS(report.timestamp),
-            MODALITY_TAGS("px4", "gyroscope", "sensor", "time"),
-            "Gyroscope y axis");
-    assert(err == 0);
-    err = MODALITY_PROBE_RECORD_W_F32_W_TIME(
-            _probe,
-            Z_AXIS,
-            report.z,
-            US_TO_NS(report.timestamp),
-            MODALITY_TAGS("px4", "gyroscope", "sensor", "time"),
-            "Gyroscope z axis");
-    assert(err == 0);
+    if(_log_data.load() == true)
+    {
+        _log_data.store(false);
+        err = MODALITY_PROBE_RECORD_W_F32_W_TIME(
+                _probe,
+                X_AXIS,
+                report.x,
+                US_TO_NS(report.timestamp),
+                MODALITY_TAGS("px4", "gyroscope", "sensor", "time"),
+                "Gyroscope x axis [radians/second]");
+        assert(err == 0);
+        err = MODALITY_PROBE_RECORD_W_F32_W_TIME(
+                _probe,
+                Y_AXIS,
+                report.y,
+                US_TO_NS(report.timestamp),
+                MODALITY_TAGS("px4", "gyroscope", "sensor", "time"),
+                "Gyroscope y axis [radians/second]");
+        assert(err == 0);
+        err = MODALITY_PROBE_RECORD_W_F32_W_TIME(
+                _probe,
+                Z_AXIS,
+                report.z,
+                US_TO_NS(report.timestamp),
+                MODALITY_TAGS("px4", "gyroscope", "sensor", "time"),
+                "Gyroscope z axis [radians/second]");
+        assert(err == 0);
+    }
 
     size_t snapshot_size = 0;
     err = modality_probe_produce_snapshot_bytes(
@@ -209,9 +250,25 @@ void PX4Gyroscope::Publish(const hrt_abstime &timestamp_sample, float x, float y
 
 	_sensor_pub.publish(report);
 
-    const int should_report = update_last_report_time(REPORT_INTERVAL_US_GYROSCOPE, &_last_report_time);
-    if(should_report != 0)
+    if(_send_report.load() == true)
     {
-        send_probe_report(_probe, _report_socket, _report_buffer, sizeof(_report_buffer));
+        _send_report.store(false);
+        send_probe_report(
+                _probe,
+                _report_socket,
+                COLLECTOR_PORT_D,
+                _report_buffer,
+                sizeof(_report_buffer));
+    }
+
+    if(_send_mutator_announcement.load() == true)
+    {
+        _send_mutator_announcement.store(false);
+        send_mutator_announcement(
+                _probe,
+                _report_socket,
+                COLLECTOR_PORT_A,
+                _report_buffer,
+                sizeof(_report_buffer));
     }
 }

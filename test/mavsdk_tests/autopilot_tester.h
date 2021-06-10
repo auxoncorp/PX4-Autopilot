@@ -39,6 +39,7 @@
 #include <mavsdk/plugins/mission/mission.h>
 #include <mavsdk/plugins/offboard/offboard.h>
 #include <mavsdk/plugins/telemetry/telemetry.h>
+#include <mavsdk/plugins/param/param.h>
 #include "catch2/catch.hpp"
 #include <chrono>
 #include <memory>
@@ -83,6 +84,11 @@ public:
 	void check_mission_item_speed_above(int item_index, float min_speed_m_s);
 	void check_tracks_mission(float corridor_radius_m = 1.0f);
 
+    void set_i32_param(const std::string name, const int32_t value);
+    void modality_check(const std::string expression, const bool should_pass);
+    void modality_open_scope(const std::string name);
+    void modality_close_scope(const std::string name);
+    void modality_auto_mutate_for_objective_if_set();
 
 private:
 	mavsdk::geometry::CoordinateTransformation get_coordinate_transformation();
@@ -100,6 +106,7 @@ private:
 	std::unique_ptr<mavsdk::Action> _action{};
 	std::unique_ptr<mavsdk::Mission> _mission{};
 	std::unique_ptr<mavsdk::Offboard> _offboard{};
+    std::unique_ptr<mavsdk::Param> _param;
 
 	Telemetry::GroundTruth _home{NAN, NAN, NAN};
 };

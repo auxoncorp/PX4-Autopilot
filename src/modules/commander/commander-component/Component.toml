@@ -1,5 +1,5 @@
 name = "commander-component"
 id = "31e0c252-5a6a-43fd-965a-40bd5556c257"
-code_hash = "a9cf656060b6d77c59cb9bd169c61feed745888f70c5d32d0e07b4687aabc9a1"
-instrumentation_hash = "f0c881755dd818d38cf54dbf4f1add3d62f90d605fa3511027340cee6eb3c3e3"
-tags = []
+code_hash = "e9b391e211314466235de2515c782fa94f090e184fe26ccf892568417481907f"
+instrumentation_hash = "19a2bd9a36af2dedf6f444d7293b24593b7204327d9263241cf18f6220221b3c"
+tags = ["px4", "commander"]

@@ -16,10 +16,7 @@ f8b467f7-c6ea-495d-b7be-a4d008afb5ba,1073741689,DYNAMIC_EXPECTATION,Modulus stim
 f8b467f7-c6ea-495d-b7be-a4d008afb5ba,1073741688,MODALITY_CONTROL_MSG_DROPPED,Modulus control message dropped,INTERNAL,u32,,
 f8b467f7-c6ea-495d-b7be-a4d008afb5ba,1073741687,MODALITY_TRIGGER_DROPPED,Modulus trigger control block dropped,INTERNAL,u32,,
 f8b467f7-c6ea-495d-b7be-a4d008afb5ba,1073741686,MODALITY_MUTATION_EPOCH_ADVANCED,Mutation epoch advanced,INTERNAL,u16,,
-f8b467f7-c6ea-495d-b7be-a4d008afb5ba,1,STATE_RESET,Battery reset it's state,px4;battery;power,,battery/battery.cpp,143
-f8b467f7-c6ea-495d-b7be-a4d008afb5ba,2,RAW_VOLTAGE,Battery sampled raw voltage,px4;battery;power;time,f32,battery/battery.cpp,169
-f8b467f7-c6ea-495d-b7be-a4d008afb5ba,3,FILTERED_VOLTAGE,Battery filtered voltage,px4;battery;voltage;power;time,f32,battery/battery.cpp,185
-f8b467f7-c6ea-495d-b7be-a4d008afb5ba,4,CONNECTED,Battery connected state,px4;battery;power,bool,battery/battery.cpp,194
-f8b467f7-c6ea-495d-b7be-a4d008afb5ba,5,WARNING_LEVEL,Battery warning level,px4;battery;power,u8,battery/battery.cpp,223
-f8b467f7-c6ea-495d-b7be-a4d008afb5ba,6,WARNING_LEVEL_OK,Battery nominal voltage check,EXPECTATION;SEVERITY_8;px4;battery;power,u32,battery/battery.cpp,231
-f8b467f7-c6ea-495d-b7be-a4d008afb5ba,7,EMERGENCY_WARNING_LEVEL,Battery emergency warning level,FAILURE;SEVERITY_10;px4;battery;power,,battery/battery.cpp,353
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,1,STATE_RESET,Battery reset it's state,px4;battery;power,,battery/battery.cpp,167
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,2,FILTERED_VOLTAGE,Battery filtered voltage [volts],px4;battery;voltage;power;time,f32,battery/battery.cpp,203
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,3,WARNING_LEVEL,Battery warning level,px4;battery;power,u8,battery/battery.cpp,234
+f8b467f7-c6ea-495d-b7be-a4d008afb5ba,4,EMERGENCY_WARNING_LEVEL,Battery emergency warning level,FAILURE;SEVERITY_10;px4;battery;power,,battery/battery.cpp,371

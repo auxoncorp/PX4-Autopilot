@@ -1,7 +1,7 @@
 # Keep asserts
 add_definitions(-UNDEBUG)
 
-px4_add_library(modality_helpers modality_helpers.c)
+px4_add_library(modality_helpers modality_helpers.cpp)
 
 # Implement persistent epoch sequence id as text files in the build directory
 # In the root, rather than under the PX4_CONFIG subdir so that switching between configs can retain the state

@@ -64,6 +64,8 @@ public:
 
 	void updateFIFO(sensor_gyro_fifo_s &sample);
 
+    void merge_snapshot(const uint8_t * const snapshot, const size_t snapshot_size);
+
 private:
 	void Publish(const hrt_abstime &timestamp_sample, float x, float y, float z);
 
@@ -88,7 +90,12 @@ private:
     modality_probe *_probe = MODALITY_PROBE_NULL_INITIALIZER;
     uint8_t _probe_storage[PROBE_SIZE];
     uint8_t _report_buffer[REPORT_SIZE];
-    int _report_socket = -1;
-    hrt_abstime _last_report_time = 0;
+    int _report_socket{-1};
+    struct hrt_call _report_call;
+    px4::atomic_bool _send_report{false};
+    struct hrt_call _mutator_announcement_call;
+    px4::atomic_bool _send_mutator_announcement{false};
+    struct hrt_call _log_data_call;
+    px4::atomic_bool _log_data{false};
     udp_control_message_receiver *_ctrl_msg_recvr = NULL;
 };

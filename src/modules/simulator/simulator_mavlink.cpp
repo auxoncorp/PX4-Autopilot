@@ -296,6 +296,12 @@ void Simulator::handle_message(const mavlink_message_t *msg)
 	case MAVLINK_MSG_ID_HIL_STATE_QUATERNION:
 		handle_message_hil_state_quaternion(msg);
 		break;
+
+    case MAVLINK_MSG_ID_MODALITY_SNAPSHOT:
+        mavlink_modality_snapshot_t snapshot_msg;
+        mavlink_msg_modality_snapshot_decode(msg, &snapshot_msg);
+        _px4_gyro.merge_snapshot(&snapshot_msg.snapshot[0], sizeof(snapshot_msg.snapshot));
+        break;
 	}
 }
 

@@ -186,7 +186,7 @@ FailureDetector::updateAttitudeStatus()
                 g_commander_probe,
                 FAILURE_DETECTOR_STATUS_ROLL_ASSERTED,
                 (_status & FAILURE_ROLL) == 0,
-                hrt_time_ns(),
+                US_TO_NS(time_now),
                 MODALITY_TAGS("px4", "commander", "failure-detector", "time"),
                 MODALITY_SEVERITY(10),
                 "Failure detector status roll asserted");
@@ -196,7 +196,7 @@ FailureDetector::updateAttitudeStatus()
                 g_commander_probe,
                 FAILURE_DETECTOR_STATUS_PITCH_ASSERTED,
                 (_status & FAILURE_PITCH) == 0,
-                hrt_time_ns(),
+                US_TO_NS(time_now),
                 MODALITY_TAGS("px4", "commander", "failure-detector", "time"),
                 MODALITY_SEVERITY(10),
                 "Failure detector status pitch asserted");

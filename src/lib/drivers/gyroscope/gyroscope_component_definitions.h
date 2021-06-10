@@ -4,8 +4,8 @@
  * Component:
  *   Name: gyroscope-component
  *   ID: 6779bbe8-b7eb-447c-b4b5-56a9d7c00aa2
- *   Code hash: cc946bd415976de44ecbe83005c816d948b1f551f2bf8a749f4660a8da1d6954
- *   Instrumentation hash: 734e86f7143d87f3c4ceb84c09d254b4a9c91f8bb843f4f393f8cccef819eb71
+ *   Code hash: 780d00b52ba341dbef3ccbfc653b9146d2e08e6a5e358fda119e1817e3ab8132
+ *   Instrumentation hash: fa51771574b055bc9de6a9fca46560230c5112634f9d22cf43b70a27d5c0e6f8
  */
 
 #ifndef MODALITY_PROBE_GENERATED_IDENTIFIERS_H
@@ -16,7 +16,7 @@ extern "C" {
 #endif
 
 /*
- * Probes (sha3-256 21e1a3e1cf1d38cf573213c1c366dae4941311e1143a7b70615831cf50204a4c)
+ * Probes (sha3-256 46e9539be24c89da58466c10884c03f943af3784c376bfc0e23fc0e8b1798f02)
  */
 
 /*
@@ -26,39 +26,39 @@ extern "C" {
  * Tags: px4;library;gyroscope;sensor;control-plane
  * Location: gyroscope/PX4Gyroscope.cpp:74
  */
-#define PX4_GYROSCOPE (338255242UL)
+#define PX4_GYROSCOPE (441590204UL)
 
 /*
- * Events (sha3-256 5a36c305c30a77b16692548a01cfa452b2a9531962e29d29d31ba651d148b4ed)
+ * Events (sha3-256 59e057e3dd3be19429e32f64d340aa0bafb61850946ce4d0fe0fbe14c846b333)
  */
 
 /*
  * Name: X_AXIS
- * Description: Gyroscope x axis
+ * Description: Gyroscope x axis [radians/second]
  * Component ID: 6779bbe8-b7eb-447c-b4b5-56a9d7c00aa2
  * Tags: px4;gyroscope;sensor;time
  * Payload type: f32
- * Location: gyroscope/PX4Gyroscope.cpp:177
+ * Location: gyroscope/PX4Gyroscope.cpp:217
  */
 #define X_AXIS (1UL)
 
 /*
  * Name: Y_AXIS
- * Description: Gyroscope y axis
+ * Description: Gyroscope y axis [radians/second]
  * Component ID: 6779bbe8-b7eb-447c-b4b5-56a9d7c00aa2
  * Tags: px4;gyroscope;sensor;time
  * Payload type: f32
- * Location: gyroscope/PX4Gyroscope.cpp:185
+ * Location: gyroscope/PX4Gyroscope.cpp:225
  */
 #define Y_AXIS (2UL)
 
 /*
  * Name: Z_AXIS
- * Description: Gyroscope z axis
+ * Description: Gyroscope z axis [radians/second]
  * Component ID: 6779bbe8-b7eb-447c-b4b5-56a9d7c00aa2
  * Tags: px4;gyroscope;sensor;time
  * Payload type: f32
- * Location: gyroscope/PX4Gyroscope.cpp:193
+ * Location: gyroscope/PX4Gyroscope.cpp:233
  */
 #define Z_AXIS (3UL)
 

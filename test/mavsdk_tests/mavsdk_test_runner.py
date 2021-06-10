@@ -83,6 +83,10 @@ def is_everything_ready(config: Dict[str, str]) -> bool:
     result = True
 
     if config['mode'] == 'sitl':
+        if is_running('modalityd') == False:
+            print("modalityd process is not running\n"
+                  "run `sudo systemctl start modalityd` and try again")
+            result = False
         if is_running('px4'):
             print("px4 process already running\n"
                   "run `killall px4` and try again")

@@ -131,8 +131,9 @@ private:
     modality_probe *_probe = MODALITY_PROBE_NULL_INITIALIZER;
     uint8_t _probe_storage[PROBE_SIZE];
     uint8_t _report_buffer[REPORT_SIZE];
-    int _report_socket = -1;
-    hrt_abstime _last_report_time = 0;
+    int _report_socket{-1};
+    struct hrt_call _report_call;
+    px4::atomic_bool _send_report{false};
 };
 
 } // namespace sensors

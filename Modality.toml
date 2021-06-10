@@ -1,8 +1,20 @@
 modalityd = "http://localhost:14181/v1/"
+# Can be a single common connection shared by all probes, or split up like below
 collector_connections = [
-    "udp://127.0.0.1:2718",
+    # Gazebo simulator plugin probe
+    "udp://127.0.0.1:2700",
+    # PX4 probes
+    "udp://127.0.0.1:2710",
+    "udp://127.0.0.1:2711",
+    "udp://127.0.0.1:2712",
+    "udp://127.0.0.1:2713",
+    "udp://127.0.0.1:2714",
+    "udp://127.0.0.1:2715",
+    "udp://127.0.0.1:2716",
 ]
 control_connections = [
+    # Gazebo simulator plugin probe
+    "udp://127.0.0.1:33000",
     # Battery probe
     "udp://127.0.0.1:34000",
     # Gyroscope probe

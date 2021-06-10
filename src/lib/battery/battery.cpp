@@ -124,6 +124,30 @@ Battery::Battery(int index, ModuleParams *parent, const int sample_interval_us) 
             "Battery probe");
     assert(err == MODALITY_PROBE_ERROR_OK);
     LOG_PROBE_INIT_W_RECVR(PX4_BATTERY, UDP_CONTROL_RECVR_BATTERY);
+
+    hrt_call_init(&_report_call);
+    hrt_call_every(
+            &_report_call,
+            0,
+            REPORT_INTERVAL_US,
+            (hrt_callout) &set_atomic_bool,
+            &_send_report);
+
+    hrt_call_init(&_mutator_announcement_call);
+    hrt_call_every(
+            &_mutator_announcement_call,
+            0,
+            MUTATOR_ANNOUNCEMENT_INTERVAL_US,
+            (hrt_callout) &set_atomic_bool,
+            &_send_mutator_announcement);
+
+    hrt_call_init(&_log_data_call);
+    hrt_call_every(
+            &_log_data_call,
+            0,
+            SAMPLE_LOG_INTERVAL_US,
+            (hrt_callout) &set_atomic_bool,
+            &_log_data);
 }
 
 void Battery::reset()
@@ -166,15 +190,6 @@ void Battery::updateBatteryStatus(const hrt_abstime &timestamp, float voltage_v,
 		_throttle_filter.reset(throttle_normalized);
 	}
 
-    err = MODALITY_PROBE_RECORD_W_F32_W_TIME(
-            _probe,
-            RAW_VOLTAGE,
-            voltage_v,
-            hrt_time_ns(),
-            MODALITY_TAGS("px4", "battery", "power", "time"),
-            "Battery sampled raw voltage");
-    assert(err == 0);
-
 	_voltage_filter_v.update(voltage_v);
 	_current_filter_a.update(current_a);
 	_throttle_filter.update(throttle_normalized);
@@ -182,22 +197,18 @@ void Battery::updateBatteryStatus(const hrt_abstime &timestamp, float voltage_v,
 	estimateRemaining(_voltage_filter_v.getState(), _current_filter_a.getState(), _throttle_filter.getState());
 	computeScale();
 
-    err = MODALITY_PROBE_RECORD_W_F32_W_TIME(
-            _probe,
-            FILTERED_VOLTAGE,
-            _voltage_filter_v.getState(),
-            hrt_time_ns(),
-            MODALITY_TAGS("px4", "battery", "voltage", "power", "time"),
-            "Battery filtered voltage");
-    assert(err == MODALITY_PROBE_ERROR_OK);
-
-    err = MODALITY_PROBE_RECORD_W_BOOL(
-            _probe,
-            CONNECTED,
-            connected,
-            MODALITY_TAGS("px4", "battery", "power"),
-            "Battery connected state");
-    assert(err == MODALITY_PROBE_ERROR_OK);
+    if(_log_data.load() == true)
+    {
+        _log_data.store(false);
+        err = MODALITY_PROBE_RECORD_W_F32_W_TIME(
+                _probe,
+                FILTERED_VOLTAGE,
+                _voltage_filter_v.getState(),
+                hrt_time_ns(),
+                MODALITY_TAGS("px4", "battery", "voltage", "power", "time"),
+                "Battery filtered voltage [volts]");
+        assert(err == MODALITY_PROBE_ERROR_OK);
+    }
 
 	if (_battery_initialized) {
 		determineWarning(connected);
@@ -226,15 +237,6 @@ void Battery::updateBatteryStatus(const hrt_abstime &timestamp, float voltage_v,
             (uint8_t) _warning,
             MODALITY_TAGS("px4", "battery", "power"),
             "Battery warning level");
-    assert(err == MODALITY_PROBE_ERROR_OK);
-
-    err = MODALITY_PROBE_EXPECT(
-            _probe,
-            WARNING_LEVEL_OK,
-            _warning < battery_status_s::BATTERY_WARNING_CRITICAL,
-            MODALITY_TAGS("px4", "battery", "power"),
-            MODALITY_SEVERITY(8),
-            "Battery nominal voltage check");
     assert(err == MODALITY_PROBE_ERROR_OK);
 
 	if (_voltage_filter_v.getState() > 2.1f) {
@@ -272,10 +274,26 @@ void Battery::updateBatteryStatus(const hrt_abstime &timestamp, float voltage_v,
 		publish();
 	}
 
-    const int should_report = update_last_report_time(REPORT_INTERVAL_US, &_last_report_time);
-    if(should_report != 0)
+    if(_send_report.load() == true)
     {
-        send_probe_report(_probe, _report_socket, _report_buffer, sizeof(_report_buffer));
+        _send_report.store(false);
+        send_probe_report(
+                _probe,
+                _report_socket,
+                COLLECTOR_PORT_A,
+                _report_buffer,
+                sizeof(_report_buffer));
+    }
+
+    if(_send_mutator_announcement.load() == true)
+    {
+        _send_mutator_announcement.store(false);
+        send_mutator_announcement(
+                _probe,
+                _report_socket,
+                COLLECTOR_PORT_A,
+                _report_buffer,
+                sizeof(_report_buffer));
     }
 }
 

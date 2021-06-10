@@ -4,8 +4,8 @@
  * Component:
  *   Name: battery-component
  *   ID: f8b467f7-c6ea-495d-b7be-a4d008afb5ba
- *   Code hash: be145c0bb548db53edea73667e27386f3d36a793a10c0f2e8cc2bbca96350d76
- *   Instrumentation hash: 438cd722892386a6b9256fe642a12a57d66c572c5731fa44ba77e17a6bf4984a
+ *   Code hash: 066302afec5a02a0193e78317db18845f6f25e02f6d0a4b80a83fb3470d7fb91
+ *   Instrumentation hash: d631af55b4e114cb933dd7ea5734c3f534fab58a5da728e7a196e940ad0ecd07
  */
 
 #ifndef MODALITY_PROBE_GENERATED_IDENTIFIERS_H
@@ -29,7 +29,7 @@ extern "C" {
 #define PX4_BATTERY (318704251UL)
 
 /*
- * Events (sha3-256 364d3fd5a778618fc5e7c51ebe5313034b4f4cfd714977d455e4242e45dd537b)
+ * Events (sha3-256 4069ce3466c5db84db66c9d7646dbeb0f1d11ff1f08282d94450631fbbc2e904)
  */
 
 /*
@@ -38,39 +38,19 @@ extern "C" {
  * Component ID: f8b467f7-c6ea-495d-b7be-a4d008afb5ba
  * Tags: px4;battery;power
  * Payload type:
- * Location: battery/battery.cpp:143
+ * Location: battery/battery.cpp:167
  */
 #define STATE_RESET (1UL)
 
 /*
- * Name: RAW_VOLTAGE
- * Description: Battery sampled raw voltage
- * Component ID: f8b467f7-c6ea-495d-b7be-a4d008afb5ba
- * Tags: px4;battery;power;time
- * Payload type: f32
- * Location: battery/battery.cpp:169
- */
-#define RAW_VOLTAGE (2UL)
-
-/*
  * Name: FILTERED_VOLTAGE
- * Description: Battery filtered voltage
+ * Description: Battery filtered voltage [volts]
  * Component ID: f8b467f7-c6ea-495d-b7be-a4d008afb5ba
  * Tags: px4;battery;voltage;power;time
  * Payload type: f32
- * Location: battery/battery.cpp:185
+ * Location: battery/battery.cpp:203
  */
-#define FILTERED_VOLTAGE (3UL)
-
-/*
- * Name: CONNECTED
- * Description: Battery connected state
- * Component ID: f8b467f7-c6ea-495d-b7be-a4d008afb5ba
- * Tags: px4;battery;power
- * Payload type: bool
- * Location: battery/battery.cpp:194
- */
-#define CONNECTED (4UL)
+#define FILTERED_VOLTAGE (2UL)
 
 /*
  * Name: WARNING_LEVEL
@@ -78,19 +58,9 @@ extern "C" {
  * Component ID: f8b467f7-c6ea-495d-b7be-a4d008afb5ba
  * Tags: px4;battery;power
  * Payload type: u8
- * Location: battery/battery.cpp:223
+ * Location: battery/battery.cpp:234
  */
-#define WARNING_LEVEL (5UL)
-
-/*
- * Name: WARNING_LEVEL_OK
- * Description: Battery nominal voltage check
- * Component ID: f8b467f7-c6ea-495d-b7be-a4d008afb5ba
- * Tags: EXPECTATION;SEVERITY_8;px4;battery;power
- * Payload type: u32
- * Location: battery/battery.cpp:231
- */
-#define WARNING_LEVEL_OK (6UL)
+#define WARNING_LEVEL (3UL)
 
 /*
  * Name: EMERGENCY_WARNING_LEVEL
@@ -98,9 +68,9 @@ extern "C" {
  * Component ID: f8b467f7-c6ea-495d-b7be-a4d008afb5ba
  * Tags: FAILURE;SEVERITY_10;px4;battery;power
  * Payload type:
- * Location: battery/battery.cpp:353
+ * Location: battery/battery.cpp:371
  */
-#define EMERGENCY_WARNING_LEVEL (7UL)
+#define EMERGENCY_WARNING_LEVEL (4UL)
 
 #ifdef __cplusplus
 } /* extern "C" */

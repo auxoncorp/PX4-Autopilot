@@ -257,6 +257,7 @@ class TestRunner(Runner):
         self.name = "mavsdk_tests"
         self.cwd = workspace_dir
         self.env = {"PATH": os.environ['PATH']}
+        self.add_to_env_if_set("OBJECTIVE_NAME")
         self.cmd = workspace_dir + \
             "/build/px4_sitl_default/mavsdk_tests/mavsdk_tests"
         self.args = ["--url", mavlink_connection, case]

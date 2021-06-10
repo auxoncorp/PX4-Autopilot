@@ -105,6 +105,7 @@ void AutopilotTester::connect(const std::string uri)
 	_action.reset(new Action(system));
 	_mission.reset(new Mission(system));
 	_offboard.reset(new Offboard(system));
+    _param.reset(new Param(system));
 }
 
 void AutopilotTester::wait_until_ready()
@@ -408,4 +409,70 @@ bool AutopilotTester::ground_truth_horizontal_position_close_to(const Telemetry:
 	}
 
 	return pass;
+}
+
+void AutopilotTester::set_i32_param(const std::string name, const int32_t value)
+{
+    CHECK(Param::Result::Success == _param->set_param_int(name, value));
+    const auto result = _param->get_param_int(name);
+    CHECK(result.first == Param::Result::Success);
+    CHECK(result.second == value);
+}
+
+void AutopilotTester::modality_check(const std::string expression, const bool should_pass)
+{
+    CHECK(expression.empty() == false);
+    const std::string cmd = "modality check '" + expression + "'";
+    std::cout << "Running Modality command: "
+        << cmd << std::endl << "Expected result: "
+        << (should_pass == true ? "true" : "false") << std::endl;
+    const int status = system(cmd.c_str());
+    CHECK(status >= 0);
+    CHECK(WIFEXITED(status));
+    if(should_pass == true)
+    {
+        CHECK(WEXITSTATUS(status) == 0);
+    }
+    else
+    {
+        CHECK(WEXITSTATUS(status) == 1);
+    }
+}
+
+void AutopilotTester::modality_open_scope(const std::string name)
+{
+    CHECK(name.empty() == false);
+    std::string cmd = "modality session scope open '" + name + "'";
+    std::cout << "Running Modality command: " << cmd << std::endl;
+    const int status = system(cmd.c_str());
+    CHECK(status >= 0);
+    CHECK(WIFEXITED(status));
+    CHECK(WEXITSTATUS(status) == 0);
+}
+
+void AutopilotTester::modality_close_scope(const std::string name)
+{
+    CHECK(name.empty() == false);
+    std::string cmd = "modality session scope close '" + name + "'";
+    std::cout << "Running Modality command: " << cmd << std::endl;
+    const int status = system(cmd.c_str());
+    CHECK(status >= 0);
+    CHECK(WIFEXITED(status));
+    CHECK(WEXITSTATUS(status) == 0);
+}
+
+void AutopilotTester::modality_auto_mutate_for_objective_if_set()
+{
+    const char * const env_objective = std::getenv("OBJECTIVE_NAME");
+    if(env_objective != NULL)
+    {
+        std::string objective_name(env_objective);
+        CHECK(objective_name.empty() == false);
+        std::string cmd = "modality mutate --objective-name '" + objective_name + "'";
+        std::cout << "Running Modality command: " << cmd << std::endl;
+        const int status = system(cmd.c_str());
+        CHECK(status >= 0);
+        CHECK(WIFEXITED(status));
+        CHECK(WEXITSTATUS(status) == 0);
+    }
 }

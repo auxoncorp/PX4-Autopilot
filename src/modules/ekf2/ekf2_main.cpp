@@ -546,8 +546,11 @@ private:
     modality_probe *_probe = MODALITY_PROBE_NULL_INITIALIZER;
     uint8_t _probe_storage[PROBE_SIZE];
     uint8_t _report_buffer[REPORT_SIZE];
-    int _report_socket = -1;
-    hrt_abstime _last_report_time = 0;
+    int _report_socket{-1};
+    struct hrt_call _report_call;
+    px4::atomic_bool _send_report{false};
+    struct hrt_call _log_data_call;
+    px4::atomic_bool _log_data{false};
 };
 
 Ekf2::Ekf2(bool replay_mode):
@@ -680,6 +683,22 @@ Ekf2::Ekf2(bool replay_mode):
             "EKF2 probe");
     assert(err == MODALITY_PROBE_ERROR_OK);
     LOG_PROBE_INIT(PX4_EKF2);
+
+    hrt_call_init(&_report_call);
+    hrt_call_every(
+            &_report_call,
+            0,
+            REPORT_INTERVAL_US,
+            (hrt_callout) &set_atomic_bool,
+            &_send_report);
+
+    hrt_call_init(&_log_data_call);
+    hrt_call_every(
+            &_log_data_call,
+            0,
+            SAMPLE_LOG_INTERVAL_US,
+            (hrt_callout) &set_atomic_bool,
+            &_log_data);
 }
 
 Ekf2::~Ekf2()
@@ -864,14 +883,6 @@ void Ekf2::Run()
 		}
 
 		const hrt_abstime now = imu_sample_new.time_us;
-
-        err = MODALITY_PROBE_RECORD_W_TIME(
-                _probe,
-                UPDATE_BEGIN,
-                US_TO_NS(now),
-                MODALITY_TAGS("px4", "ekf2", "time"),
-                "EKF2 update loop begin");
-        assert(err == MODALITY_PROBE_ERROR_OK);        
 
 		// ekf2_timestamps (using 0.1 ms relative timestamps)
 		ekf2_timestamps_s ekf2_timestamps{};
@@ -1796,10 +1807,15 @@ void Ekf2::Run()
 		px4_lockstep_progress(_lockstep_component);
 	}
 
-    const int should_report = update_last_report_time(REPORT_INTERVAL_US, &_last_report_time);
-    if(should_report != 0)
+    if(_send_report.load() == true)
     {
-        send_probe_report(_probe, _report_socket, _report_buffer, sizeof(_report_buffer));
+        _send_report.store(false);
+        send_probe_report(
+                _probe,
+                _report_socket,
+                COLLECTOR_PORT_C,
+                _report_buffer,
+                sizeof(_report_buffer));
     }
 }
 
@@ -1866,6 +1882,7 @@ void Ekf2::publish_attitude(const hrt_abstime &timestamp)
 {
 	if (_ekf.attitude_valid()) {
 		// generate vehicle attitude quaternion data
+        size_t err;
 		vehicle_attitude_s att;
 		att.timestamp = timestamp;
 
@@ -1874,8 +1891,32 @@ void Ekf2::publish_attitude(const hrt_abstime &timestamp)
 
 		_ekf.get_quat_reset(&att.delta_q_reset[0], &att.quat_reset_counter);
 
+        Eulerf euler = matrix::Eulerf(q);
+
+        if(_log_data.load() == true)
+        {
+            _log_data.store(false);
+            err = MODALITY_PROBE_RECORD_W_F32_W_TIME(
+                    _probe,
+                    X_AXIS,
+                    euler.phi(),
+                    US_TO_NS(timestamp),
+                    MODALITY_TAGS("px4", "ekf2", "time"),
+                    "EKF2 phi roll angle [radians]");
+            assert(err == MODALITY_PROBE_ERROR_OK);
+
+            err = MODALITY_PROBE_RECORD_W_F32_W_TIME(
+                    _probe,
+                    Y_AXIS,
+                    euler.theta(),
+                    US_TO_NS(timestamp),
+                    MODALITY_TAGS("px4", "ekf2", "time"),
+                    "EKF2 theta pitch angle [radians]");
+            assert(err == MODALITY_PROBE_ERROR_OK);
+        }
+
         size_t snapshot_size = 0;
-        const size_t err = modality_probe_produce_snapshot_bytes(
+        err = modality_probe_produce_snapshot_bytes(
                 _probe,
                 &att.snapshot[0],
                 sizeof(att.snapshot),

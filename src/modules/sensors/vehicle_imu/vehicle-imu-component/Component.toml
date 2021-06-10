@@ -1,5 +1,5 @@
 name = "vehicle-imu-component"
 id = "dfa99a06-2d09-4d0b-a185-30812de2a8a4"
-code_hash = "a27f31626df05409d36afbadf63d8953bde123d8f4819330e6529bf431be2775"
-instrumentation_hash = "ebe7bbf89d33f29f35f341f4c7b96db961c9a98c646d13236f7ee6bc14b296bb"
-tags = []
+code_hash = "75aa737526e1089ad35b3ed10143621bdb643cf63e3208c6cc0a1e27d1e3c7b6"
+instrumentation_hash = "daf1917518c79cfa7587ba1b25f487376369733707e2ee49a1e254022b9ae434"
+tags = ["px4", "vehicle-imu"]

@@ -23,6 +23,7 @@ if(MAVSDK_FOUND)
         MAVSDK::mavsdk_mission
         MAVSDK::mavsdk_offboard
         MAVSDK::mavsdk_telemetry
+        MAVSDK::mavsdk_param
     )
 
     target_compile_options(mavsdk_tests

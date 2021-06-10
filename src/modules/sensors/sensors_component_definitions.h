@@ -4,8 +4,8 @@
  * Component:
  *   Name: sensors-component
  *   ID: 81e416a3-7250-47d4-9c24-3b6f1c6fbcdc
- *   Code hash: 82d3a762faf0bab60dff4a74edb78c6bf28f99bb2bc3824ab66e6d515a9360db
- *   Instrumentation hash: 0d079c3e9584f576b5a4f170f3437fdd71919b18d62da38a5b748cc5897f068a
+ *   Code hash: 8842aa3b2cbf62dd68f490f7a51b2fd90a0270cab3a7dd338f194d1d890c1995
+ *   Instrumentation hash: 22ff54db8a8d628d190f5e525d45c536e208aea40bae7a60af4a3e29db5ff609
  */
 
 #ifndef MODALITY_PROBE_GENERATED_IDENTIFIERS_H
@@ -16,7 +16,7 @@ extern "C" {
 #endif
 
 /*
- * Probes (sha3-256 6b2bb4ebcb0f1bc119733120f565b20b17bc5dcecf63bf21c6868e45f9601fc1)
+ * Probes (sha3-256 b58a26c05a20166b0b62df7ed218c0ca35119b30134f95b52d0c9b7810d66b70)
  */
 
 /*
@@ -24,23 +24,13 @@ extern "C" {
  * Description: Sensors probe
  * Component ID: 81e416a3-7250-47d4-9c24-3b6f1c6fbcdc
  * Tags: px4;module;sensors
- * Location: sensors/sensors.cpp:241
+ * Location: sensors/sensors.cpp:242
  */
 #define PX4_SENSORS (213414513UL)
 
 /*
- * Events (sha3-256 93c42cefea1ce8b3640161eff63646bf20c3205b2b63e2e3365ed42bff42e85c)
+ * Events (sha3-256 0451c86beb25f9f1f479338c60c0bb1204f135153f0c34c747d2011fedeef7e0)
  */
-
-/*
- * Name: ADC_POLLED
- * Description: ADC polled
- * Component ID: 81e416a3-7250-47d4-9c24-3b6f1c6fbcdc
- * Tags: px4;sensors;adc
- * Payload type:
- * Location: sensors/sensors.cpp:455
- */
-#define ADC_POLLED (1UL)
 
 /*
  * Name: SENSORS_POLLED
@@ -48,9 +38,9 @@ extern "C" {
  * Component ID: 81e416a3-7250-47d4-9c24-3b6f1c6fbcdc
  * Tags: px4;sensors
  * Payload type:
- * Location: sensors/sensors.cpp:581
+ * Location: sensors/sensors.cpp:584
  */
-#define SENSORS_POLLED (2UL)
+#define SENSORS_POLLED (1UL)
 
 #ifdef __cplusplus
 } /* extern "C" */

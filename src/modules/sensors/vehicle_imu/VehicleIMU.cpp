@@ -90,6 +90,14 @@ VehicleIMU::VehicleIMU(uint8_t accel_index, uint8_t gyro_index) :
             "Vehicle IMU probe");
     assert(err == MODALITY_PROBE_ERROR_OK);
     LOG_PROBE_INIT(PX4_VEHICLE_IMU);
+
+    hrt_call_init(&_report_call);
+    hrt_call_every(
+            &_report_call,
+            0,
+            REPORT_INTERVAL_US,
+            (hrt_callout) &set_atomic_bool,
+            &_send_report);
 }
 
 VehicleIMU::~VehicleIMU()
@@ -348,14 +356,6 @@ void VehicleIMU::Run()
 
     err = MODALITY_PROBE_RECORD_W_BOOL(
             _probe,
-            ACCEL_INTEGRATOR_READY,
-            _accel_integrator.integral_ready(),
-            MODALITY_TAGS("px4", "vehicle-imu", "accelerometer"),
-            "Accelerometer integrator ready");
-    assert(err == MODALITY_PROBE_ERROR_OK);
-
-    err = MODALITY_PROBE_RECORD_W_BOOL(
-            _probe,
             GYRO_INTEGRATOR_READY,
             _gyro_integrator.integral_ready(),
             MODALITY_TAGS("px4", "vehicle-imu", "gyroscope"),
@@ -421,20 +421,30 @@ void VehicleIMU::Run()
 			// reset clip counts
 			_delta_velocity_clipping = 0;
 
-            const int should_report = update_last_report_time(REPORT_INTERVAL_US, &_last_report_time);
-            if(should_report != 0)
+            if(_send_report.load() == true)
             {
-                send_probe_report(_probe, _report_socket, _report_buffer, sizeof(_report_buffer));
+                _send_report.store(false);
+                send_probe_report(
+                        _probe,
+                        _report_socket,
+                        COLLECTOR_PORT_G,
+                        _report_buffer,
+                        sizeof(_report_buffer));
             }
 
 			return;
 		}
 	}
 
-    const int should_report = update_last_report_time(REPORT_INTERVAL_US, &_last_report_time);
-    if(should_report != 0)
+    if(_send_report.load() == true)
     {
-        send_probe_report(_probe, _report_socket, _report_buffer, sizeof(_report_buffer));
+        _send_report.store(false);
+        send_probe_report(
+                _probe,
+                _report_socket,
+                COLLECTOR_PORT_G,
+                _report_buffer,
+                sizeof(_report_buffer));
     }
 }
 

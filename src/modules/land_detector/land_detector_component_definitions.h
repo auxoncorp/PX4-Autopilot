@@ -4,7 +4,7 @@
  * Component:
  *   Name: land-detector-component
  *   ID: a3d31cc0-c05d-4653-a225-32f29eec463f
- *   Code hash: 0c3a54aef73c14c640fbd8758093dd5656ff6a3692ef4aa35941aa4bc4fe955c
+ *   Code hash: 7f2beaf3877a20bf8b5ea1f7ae2e8a755a2847c061da3cbf01c97e140e7e324b
  *   Instrumentation hash: 11cd3fe8d11560297b044e7961ef14e8b2a36432eccb005b701bb90910009e3b
  */
 
@@ -29,7 +29,7 @@ extern "C" {
 #define PX4_LAND_DETECTOR (433462535UL)
 
 /*
- * Events (sha3-256 96c284e475a2f7ef6c7bfd7d77ea561598bb522e0e6c8328f70e5e703225ed5f)
+ * Events (sha3-256 5ecf2cfca0b4ab40f7cf8ce06e739cbb6a77abb63b34b93e029e57264ae6156b)
  */
 
 /*
@@ -38,7 +38,7 @@ extern "C" {
  * Component ID: a3d31cc0-c05d-4653-a225-32f29eec463f
  * Tags: px4;land-detector;freefall
  * Payload type: bool
- * Location: land_detector/LandDetector.cpp:132
+ * Location: land_detector/LandDetector.cpp:149
  */
 #define FREEFALL (1UL)
 
@@ -48,7 +48,7 @@ extern "C" {
  * Component ID: a3d31cc0-c05d-4653-a225-32f29eec463f
  * Tags: px4;land-detector
  * Payload type: bool
- * Location: land_detector/LandDetector.cpp:139
+ * Location: land_detector/LandDetector.cpp:156
  */
 #define GROUND_CONTACT (2UL)
 
@@ -58,7 +58,7 @@ extern "C" {
  * Component ID: a3d31cc0-c05d-4653-a225-32f29eec463f
  * Tags: px4;land-detector
  * Payload type: bool
- * Location: land_detector/LandDetector.cpp:146
+ * Location: land_detector/LandDetector.cpp:163
  */
 #define MAYBE_LANDED (3UL)
 
@@ -68,7 +68,7 @@ extern "C" {
  * Component ID: a3d31cc0-c05d-4653-a225-32f29eec463f
  * Tags: px4;land-detector
  * Payload type: bool
- * Location: land_detector/LandDetector.cpp:153
+ * Location: land_detector/LandDetector.cpp:170
  */
 #define LANDED (4UL)
 
@@ -78,7 +78,7 @@ extern "C" {
  * Component ID: a3d31cc0-c05d-4653-a225-32f29eec463f
  * Tags: px4;land-detector;takeoff
  * Payload type:
- * Location: land_detector/LandDetector.cpp:174
+ * Location: land_detector/LandDetector.cpp:182
  */
 #define TAKE_OFF_DETECTED (5UL)
 

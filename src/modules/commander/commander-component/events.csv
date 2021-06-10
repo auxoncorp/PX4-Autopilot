@@ -16,24 +16,26 @@ component_id,id,name,description,tags,type_hint,file,line
 31e0c252-5a6a-43fd-965a-40bd5556c257,1073741688,MODALITY_CONTROL_MSG_DROPPED,Modulus control message dropped,INTERNAL,u32,,
 31e0c252-5a6a-43fd-965a-40bd5556c257,1073741687,MODALITY_TRIGGER_DROPPED,Modulus trigger control block dropped,INTERNAL,u32,,
 31e0c252-5a6a-43fd-965a-40bd5556c257,1073741686,MODALITY_MUTATION_EPOCH_ADVANCED,Mutation epoch advanced,INTERNAL,u16,,
-31e0c252-5a6a-43fd-965a-40bd5556c257,1,LAND_DETECTED,Land detected,px4;commander,,commander/Commander.cpp,1667
-31e0c252-5a6a-43fd-965a-40bd5556c257,2,TAKEOFF_DETECTED,Takeoff detected,px4;commander,,commander/Commander.cpp,1685
-31e0c252-5a6a-43fd-965a-40bd5556c257,3,BATTERY_WARNING_LEVEL,Battery warn level received,px4;commander;battery;power,u8,commander/Commander.cpp,4073
-31e0c252-5a6a-43fd-965a-40bd5556c257,4,BATTERY_WARNING_LEVEL_INCREASED_WHILE_ARMED,Battery warning level increased while armed,px4;commander;battery;power,bool,commander/Commander.cpp,4081
-31e0c252-5a6a-43fd-965a-40bd5556c257,5,FAILURE_DETECTOR_RESET_ATTITUDE_STATUS,Failure detector reset attitude status,px4;commander;failure-detector,bool,commander/failure_detector/FailureDetector.cpp,64
-31e0c252-5a6a-43fd-965a-40bd5556c257,6,FAILURE_DETECTOR_UPDATED,Failure detector updated,px4;commander;failure-detector,bool,commander/failure_detector/FailureDetector.cpp,100
-31e0c252-5a6a-43fd-965a-40bd5556c257,7,FAILURE_DETECTOR_ATTITUDE_STABLE,Failure detector attitude stabilized updated,px4;commander;failure-detector;time,bool,commander/failure_detector/FailureDetector.cpp,128
-31e0c252-5a6a-43fd-965a-40bd5556c257,8,FAILURE_DETECTOR_STATUS_ROLL_ASSERTED,Failure detector status roll asserted,EXPECTATION;SEVERITY_10;px4;commander;failure-detector;time,u32,commander/failure_detector/FailureDetector.cpp,185
-31e0c252-5a6a-43fd-965a-40bd5556c257,9,FAILURE_DETECTOR_STATUS_PITCH_ASSERTED,Failure detector status pitch asserted,EXPECTATION;SEVERITY_10;px4;commander;failure-detector;time,u32,commander/failure_detector/FailureDetector.cpp,195
-31e0c252-5a6a-43fd-965a-40bd5556c257,10,LOW_BATTERY_RETURN_ADVISED,Low battery level return advised,px4;commander;battery,,commander/state_machine_helper.cpp,1005
-31e0c252-5a6a-43fd-965a-40bd5556c257,11,CRITICAL_BATTERY_LEVEL,Critical battery level,px4;commander;battery,,commander/state_machine_helper.cpp,1014
-31e0c252-5a6a-43fd-965a-40bd5556c257,12,CRITICAL_BATTERY_LANDING_ADVISED,Critical battery level landing advised,FAILURE;SEVERITY_7;px4;commander;battery,,commander/state_machine_helper.cpp,1026
-31e0c252-5a6a-43fd-965a-40bd5556c257,13,CRITICAL_BATTERY_RTL,Critical battery level RTL,FAILURE;SEVERITY_8;px4;commander;battery,,commander/state_machine_helper.cpp,1044
-31e0c252-5a6a-43fd-965a-40bd5556c257,14,CRITICAL_BATTERY_RTL_FALLBACK_LANDING,Critical battery level landing instead of RTL,FAILURE;SEVERITY_8;px4;commander;battery,,commander/state_machine_helper.cpp,1056
-31e0c252-5a6a-43fd-965a-40bd5556c257,15,CRITICAL_BATTERY_LANDING,Critical battery level landing,FAILURE;SEVERITY_8;px4;commander;battery,,commander/state_machine_helper.cpp,1071
-31e0c252-5a6a-43fd-965a-40bd5556c257,16,EMERGENCY_BATTERY_LEVEL,Emergency battery level,px4;commander;battery,,commander/state_machine_helper.cpp,1085
-31e0c252-5a6a-43fd-965a-40bd5556c257,17,EMERGENCY_BATTERY_LANDING_ADVISED,Emergency battery level landing advised,FAILURE;SEVERITY_9;px4;commander;battery,,commander/state_machine_helper.cpp,1097
-31e0c252-5a6a-43fd-965a-40bd5556c257,18,EMERGENCY_BATTERY_RTL,Emergency battery level RTL,FAILURE;SEVERITY_9;px4;commander;battery,,commander/state_machine_helper.cpp,1111
-31e0c252-5a6a-43fd-965a-40bd5556c257,19,EMERGENCY_BATTERY_RTL_FALLBACK_LANDING,Emergency battery level landing instead of RTL,FAILURE;SEVERITY_9;px4;commander;battery,,commander/state_machine_helper.cpp,1123
-31e0c252-5a6a-43fd-965a-40bd5556c257,20,EMERGENCY_BATTERY_LANDING,Emergency battery level landing,FAILURE;SEVERITY_9;px4;commander;battery,,commander/state_machine_helper.cpp,1141
-31e0c252-5a6a-43fd-965a-40bd5556c257,21,BATTERY_FAILURE_DETECTED,Battery failure detected,FAILURE;SEVERITY_10;px4;commander;battery,,commander/state_machine_helper.cpp,1156
+31e0c252-5a6a-43fd-965a-40bd5556c257,1,LAND_DETECTED,Land detected,px4;commander,,commander/Commander.cpp,1677
+31e0c252-5a6a-43fd-965a-40bd5556c257,2,TAKEOFF_DETECTED,Takeoff detected,px4;commander,,commander/Commander.cpp,1695
+31e0c252-5a6a-43fd-965a-40bd5556c257,3,LOCKDOWN_TRIGGERED,Critical failure detected: lockdown,FAILURE;SEVERITY_10;px4;commander;failure-detector;time,,commander/Commander.cpp,2317
+31e0c252-5a6a-43fd-965a-40bd5556c257,4,FLIGHT_TERMINATED,Critical failure detected: terminate flight,FAILURE;SEVERITY_10;px4;commander;failure-detector;time,,commander/Commander.cpp,2336
+31e0c252-5a6a-43fd-965a-40bd5556c257,5,BATTERY_WARNING_LEVEL,Battery warn level received,px4;commander;battery;power,u8,commander/Commander.cpp,4108
+31e0c252-5a6a-43fd-965a-40bd5556c257,6,BATTERY_WARNING_LEVEL_INCREASED_WHILE_ARMED,Battery warning level increased while armed,px4;commander;battery;power,,commander/Commander.cpp,4116
+31e0c252-5a6a-43fd-965a-40bd5556c257,7,FAILURE_DETECTOR_RESET_ATTITUDE_STATUS,Failure detector reset attitude status,px4;commander;failure-detector,bool,commander/failure_detector/FailureDetector.cpp,64
+31e0c252-5a6a-43fd-965a-40bd5556c257,8,FAILURE_DETECTOR_UPDATED,Failure detector updated,px4;commander;failure-detector,bool,commander/failure_detector/FailureDetector.cpp,100
+31e0c252-5a6a-43fd-965a-40bd5556c257,9,FAILURE_DETECTOR_ATTITUDE_STABLE,Failure detector attitude stabilized updated,px4;commander;failure-detector;time,bool,commander/failure_detector/FailureDetector.cpp,128
+31e0c252-5a6a-43fd-965a-40bd5556c257,10,FAILURE_DETECTOR_STATUS_ROLL_ASSERTED,Failure detector status roll asserted,EXPECTATION;SEVERITY_10;px4;commander;failure-detector;time,u32,commander/failure_detector/FailureDetector.cpp,185
+31e0c252-5a6a-43fd-965a-40bd5556c257,11,FAILURE_DETECTOR_STATUS_PITCH_ASSERTED,Failure detector status pitch asserted,EXPECTATION;SEVERITY_10;px4;commander;failure-detector;time,u32,commander/failure_detector/FailureDetector.cpp,195
+31e0c252-5a6a-43fd-965a-40bd5556c257,12,LOW_BATTERY_RETURN_ADVISED,Low battery level return advised,px4;commander;battery,,commander/state_machine_helper.cpp,1005
+31e0c252-5a6a-43fd-965a-40bd5556c257,13,CRITICAL_BATTERY_LEVEL,Critical battery level,px4;commander;battery,,commander/state_machine_helper.cpp,1014
+31e0c252-5a6a-43fd-965a-40bd5556c257,14,CRITICAL_BATTERY_LANDING_ADVISED,Critical battery level landing advised,FAILURE;SEVERITY_7;px4;commander;battery,,commander/state_machine_helper.cpp,1026
+31e0c252-5a6a-43fd-965a-40bd5556c257,15,CRITICAL_BATTERY_RTL,Critical battery level RTL,FAILURE;SEVERITY_8;px4;commander;battery,,commander/state_machine_helper.cpp,1044
+31e0c252-5a6a-43fd-965a-40bd5556c257,16,CRITICAL_BATTERY_RTL_FALLBACK_LANDING,Critical battery level landing instead of RTL,FAILURE;SEVERITY_8;px4;commander;battery,,commander/state_machine_helper.cpp,1056
+31e0c252-5a6a-43fd-965a-40bd5556c257,17,CRITICAL_BATTERY_LANDING,Critical battery level landing,FAILURE;SEVERITY_8;px4;commander;battery,,commander/state_machine_helper.cpp,1071
+31e0c252-5a6a-43fd-965a-40bd5556c257,18,EMERGENCY_BATTERY_LEVEL,Emergency battery level,px4;commander;battery,,commander/state_machine_helper.cpp,1085
+31e0c252-5a6a-43fd-965a-40bd5556c257,19,EMERGENCY_BATTERY_LANDING_ADVISED,Emergency battery level landing advised,FAILURE;SEVERITY_9;px4;commander;battery,,commander/state_machine_helper.cpp,1097
+31e0c252-5a6a-43fd-965a-40bd5556c257,20,EMERGENCY_BATTERY_RTL,Emergency battery level RTL,FAILURE;SEVERITY_9;px4;commander;battery,,commander/state_machine_helper.cpp,1111
+31e0c252-5a6a-43fd-965a-40bd5556c257,21,EMERGENCY_BATTERY_RTL_FALLBACK_LANDING,Emergency battery level landing instead of RTL,FAILURE;SEVERITY_9;px4;commander;battery,,commander/state_machine_helper.cpp,1123
+31e0c252-5a6a-43fd-965a-40bd5556c257,22,EMERGENCY_BATTERY_LANDING,Emergency battery level landing,FAILURE;SEVERITY_9;px4;commander;battery,,commander/state_machine_helper.cpp,1141
+31e0c252-5a6a-43fd-965a-40bd5556c257,23,BATTERY_FAILURE_DETECTED,Battery failure detected,FAILURE;SEVERITY_10;px4;commander;battery,,commander/state_machine_helper.cpp,1156
