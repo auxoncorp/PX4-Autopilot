@@ -11,7 +11,12 @@ target_compile_definitions(
     )
 
 # Modality library will be transitive, linking this target will also link libmodality_probe
-target_link_libraries(modality_helpers PUBLIC ModalityProbe::LibModalityProbe)
+target_link_libraries(
+    modality_helpers
+    PUBLIC
+    ModalityProbe::LibModalityProbe
+    ModalityProbe::LibModalityProbeSupport
+    )
 
 target_include_directories(
     modality_helpers
