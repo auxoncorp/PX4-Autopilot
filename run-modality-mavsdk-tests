@@ -18,7 +18,7 @@ TEST_CASE="Takeoff and Land"
     --speed-factor 1 \
     --model iris \
     --verbose \
-    --case "$TEST_CASE"
+    --case "$TEST_CASE" "$@"
 EXIT_CODE=$?
 
 # We expect the tests to fail occasionally
