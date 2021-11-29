@@ -44,7 +44,7 @@ set_property(GLOBAL APPEND PROPERTY PX4_MODULE_CONFIG_FILES ${CMAKE_CURRENT_SOUR
 modality_probe_generate_manifest(
     TARGET battery
     DEPENDS battery.cpp
-    COMPONENT_NAME "battery-component"
+    COMPONENT_NAME "battery"
     OUTPUT_PATH "battery-component"
     EXCLUDES "generated_mutators"
     FILE_EXTENSIONS "cpp"

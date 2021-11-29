@@ -16,6 +16,6 @@ component_id,id,name,description,tags,type_hint,file,line
 6779bbe8-b7eb-447c-b4b5-56a9d7c00aa2,1073741688,MODALITY_CONTROL_MSG_DROPPED,Modulus control message dropped,INTERNAL,u32,,
 6779bbe8-b7eb-447c-b4b5-56a9d7c00aa2,1073741687,MODALITY_TRIGGER_DROPPED,Modulus trigger control block dropped,INTERNAL,u32,,
 6779bbe8-b7eb-447c-b4b5-56a9d7c00aa2,1073741686,MODALITY_MUTATION_EPOCH_ADVANCED,Mutation epoch advanced,INTERNAL,u16,,
-6779bbe8-b7eb-447c-b4b5-56a9d7c00aa2,1,X_AXIS,Gyroscope x axis [radians/second],px4;gyroscope;sensor;time,f32,gyroscope/PX4Gyroscope.cpp,217
-6779bbe8-b7eb-447c-b4b5-56a9d7c00aa2,2,Y_AXIS,Gyroscope y axis [radians/second],px4;gyroscope;sensor;time,f32,gyroscope/PX4Gyroscope.cpp,225
-6779bbe8-b7eb-447c-b4b5-56a9d7c00aa2,3,Z_AXIS,Gyroscope z axis [radians/second],px4;gyroscope;sensor;time,f32,gyroscope/PX4Gyroscope.cpp,233
+6779bbe8-b7eb-447c-b4b5-56a9d7c00aa2,1,ROLL_ANGULAR_RATE,Gyroscope x axis roll angular rate [radians/second],px4;gyroscope;sensor;time,f32,gyroscope/PX4Gyroscope.cpp,217
+6779bbe8-b7eb-447c-b4b5-56a9d7c00aa2,2,PITCH_ANGULAR_RATE,Gyroscope y axis pitch angular rate [radians/second],px4;gyroscope;sensor;time,f32,gyroscope/PX4Gyroscope.cpp,225
+6779bbe8-b7eb-447c-b4b5-56a9d7c00aa2,3,YAW_ANGULAR_RATE,Gyroscope z axis yaw angular rate [radians/second],px4;gyroscope;sensor;time,f32,gyroscope/PX4Gyroscope.cpp,233

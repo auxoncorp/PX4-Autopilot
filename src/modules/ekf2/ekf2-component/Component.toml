@@ -1,5 +1,5 @@
-name = "ekf2-component"
+name = "ekf2"
 id = "7e757c1d-7416-4b23-80fd-958294b055da"
-code_hash = "f8c6d552e1d25592a12f340ab29244eddafe4114bf3839abd228add4ce415cc4"
-instrumentation_hash = "98fd4c66f4102bf9412961924538a9212e255cde8f119f0f8c5a3a4e1afbed86"
+code_hash = "7c11dc65e9a00ec3a07ff6cf90762b0bcc3cb67f89d1d40846a1450a5d533cdc"
+instrumentation_hash = "c34ffeb6886a1f1f42a88e7d21e2d2650a680cf7d4878cf7daa9aef84f51d09a"
 tags = ["px4", "ekf2"]

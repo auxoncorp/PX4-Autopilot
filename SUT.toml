@@ -6,7 +6,6 @@ component_paths = [
     "src/modules/land_detector/land-detector-component",
     "src/lib/drivers/gyroscope/gyroscope-component",
     "src/modules/commander/commander-component",
-    "src/modules/sensors/vehicle_imu/vehicle-imu-component",
-    "src/modules/sensors/sensors-component",
+    "src/modules/sensors/data-acquisition-component",
     "src/modules/ekf2/ekf2-component",
 ]

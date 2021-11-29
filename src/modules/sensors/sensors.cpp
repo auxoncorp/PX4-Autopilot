@@ -82,7 +82,7 @@
 #include <modality_helpers/modality_helpers.h>
 
 #include "sensors_probe.h"
-#include "sensors_component_definitions.h"
+#include "data_acquisition_component_definitions.h"
 
 /* Global probe used by the sensors module and its utilities */
 modality_probe *g_sensors_probe = MODALITY_PROBE_NULL_INITIALIZER;
@@ -242,7 +242,7 @@ Sensors::Sensors(bool hil_enabled) :
     const size_t err = MODALITY_PROBE_INIT(
             &g_probe_storage[0],
             sizeof(g_probe_storage),
-            PX4_SENSORS,
+            SENSORS,
             PX4_WALL_CLOCK_RESOLUTION_NS,
             PX4_WALL_CLOCK_ID,
             &next_persistent_sequence_id,
@@ -251,7 +251,7 @@ Sensors::Sensors(bool hil_enabled) :
             MODALITY_TAGS("px4", "module", "sensors"),
             "Sensors probe");
     assert(err == MODALITY_PROBE_ERROR_OK);
-    LOG_PROBE_INIT(PX4_SENSORS);
+    LOG_PROBE_INIT(SENSORS);
 
     g_send_report.store(false);
     hrt_call_init(&g_report_call);
@@ -585,7 +585,7 @@ void Sensors::Run()
             g_sensors_probe,
             SENSORS_POLLED,
             MODALITY_TAGS("px4", "sensors"),
-            "Sensors polled");
+            "Combined sensors polled");
     assert(err == MODALITY_PROBE_ERROR_OK);
 
 	// check analog airspeed

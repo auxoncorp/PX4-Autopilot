@@ -1,5 +1,5 @@
-name = "gyroscope-component"
+name = "gyroscope"
 id = "6779bbe8-b7eb-447c-b4b5-56a9d7c00aa2"
-code_hash = "780d00b52ba341dbef3ccbfc653b9146d2e08e6a5e358fda119e1817e3ab8132"
-instrumentation_hash = "fa51771574b055bc9de6a9fca46560230c5112634f9d22cf43b70a27d5c0e6f8"
+code_hash = "05f6ff26955cf85f6c6c18feb5e1b31fa188dac15839598a0a8d8c006f1e2359"
+instrumentation_hash = "862256b7ea9605d61f130d54c7103bf23d96d9326f00851c9bad2414792f303a"
 tags = ["px4", "gyroscope"]

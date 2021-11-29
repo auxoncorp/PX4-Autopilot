@@ -534,7 +534,7 @@ Commander::Commander() :
     const size_t err = MODALITY_PROBE_INIT(
             &g_probe_storage[0],
             sizeof(g_probe_storage),
-            PX4_COMMANDER,
+            COMMANDER,
             PX4_WALL_CLOCK_RESOLUTION_NS,
             PX4_WALL_CLOCK_ID,
             &next_persistent_sequence_id,
@@ -543,7 +543,7 @@ Commander::Commander() :
             MODALITY_TAGS("px4", "module", "commander"),
             "Commander probe");
     assert(err == MODALITY_PROBE_ERROR_OK);
-    LOG_PROBE_INIT(PX4_COMMANDER);
+    LOG_PROBE_INIT(COMMANDER);
 
     g_send_report.store(false);
     hrt_call_init(&g_report_call);
@@ -1678,7 +1678,7 @@ Commander::run()
                                 g_commander_probe,
                                 LAND_DETECTED,
                                 MODALITY_TAGS("px4", "commander"),
-                                "Land detected");
+                                "Landing detected");
                         assert(err == MODALITY_PROBE_ERROR_OK);
 
 					} else {
@@ -2320,7 +2320,7 @@ Commander::run()
                                 hrt_time_ns(),
                                 MODALITY_TAGS("px4", "commander", "failure-detector", "time"),
                                 MODALITY_SEVERITY(10),
-                                "Critical failure detected: lockdown");
+                                "Entering lockdown due to a critical failure");
                         assert(err == MODALITY_PROBE_ERROR_OK);
 
 						mavlink_log_emergency(&mavlink_log_pub, "Critical failure detected: lockdown");
@@ -2339,7 +2339,7 @@ Commander::run()
                             hrt_time_ns(),
                             MODALITY_TAGS("px4", "commander", "failure-detector", "time"),
                             MODALITY_SEVERITY(10),
-                            "Critical failure detected: terminate flight");
+                            "Terminating flight due to a critical failure");
                     assert(err == MODALITY_PROBE_ERROR_OK);
 
 					mavlink_log_emergency(&mavlink_log_pub, "Critical failure detected: terminate flight");
@@ -4110,7 +4110,7 @@ void Commander::battery_status_check()
                 BATTERY_WARNING_LEVEL,
                 _battery_warning,
                 MODALITY_TAGS("px4", "commander", "battery", "power"),
-                "Battery warn level received");
+                "Battery warning level received");
         assert(err == MODALITY_PROBE_ERROR_OK);
 
         err = MODALITY_PROBE_RECORD(

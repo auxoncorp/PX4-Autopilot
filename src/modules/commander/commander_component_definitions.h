@@ -2,10 +2,10 @@
  * GENERATED CODE, DO NOT EDIT
  *
  * Component:
- *   Name: commander-component
+ *   Name: commander
  *   ID: 31e0c252-5a6a-43fd-965a-40bd5556c257
- *   Code hash: e9b391e211314466235de2515c782fa94f090e184fe26ccf892568417481907f
- *   Instrumentation hash: 19a2bd9a36af2dedf6f444d7293b24593b7204327d9263241cf18f6220221b3c
+ *   Code hash: 22e24ea820912732ba5f40751b360771b63c05cc34a720825f84719d852fd1b0
+ *   Instrumentation hash: 9fe24da69b1cc28cfe4b5f853b72174a6270e45757b49737fecac8a20295029f
  */
 
 #ifndef MODALITY_PROBE_GENERATED_IDENTIFIERS_H
@@ -16,25 +16,25 @@ extern "C" {
 #endif
 
 /*
- * Probes (sha3-256 86027f0683bce98867060de5734b1524d02252d9532a85e397a022ac85856639)
+ * Probes (sha3-256 88424cac9b8c9f07a4bc6d8f850f3d45571b5d3d7825cf886e29b5a0a73d19f2)
  */
 
 /*
- * Name: PX4_COMMANDER
+ * Name: COMMANDER
  * Description: Commander probe
  * Component ID: 31e0c252-5a6a-43fd-965a-40bd5556c257
  * Tags: px4;module;commander
  * Location: commander/Commander.cpp:534
  */
-#define PX4_COMMANDER (483644201UL)
+#define COMMANDER (483644201UL)
 
 /*
- * Events (sha3-256 44e3f44adb2356fcfc260d158fc7447e4e6e007090d683d512e3d76208e35dd3)
+ * Events (sha3-256 a9b093428ef9a2a86a2dfd4b82ac78a7f97d79504f69bd339fd8720b22a5ca77)
  */
 
 /*
  * Name: LAND_DETECTED
- * Description: Land detected
+ * Description: Landing detected
  * Component ID: 31e0c252-5a6a-43fd-965a-40bd5556c257
  * Tags: px4;commander
  * Payload type:
@@ -54,7 +54,7 @@ extern "C" {
 
 /*
  * Name: LOCKDOWN_TRIGGERED
- * Description: Critical failure detected: lockdown
+ * Description: Entering lockdown due to a critical failure
  * Component ID: 31e0c252-5a6a-43fd-965a-40bd5556c257
  * Tags: FAILURE;SEVERITY_10;px4;commander;failure-detector;time
  * Payload type:
@@ -64,7 +64,7 @@ extern "C" {
 
 /*
  * Name: FLIGHT_TERMINATED
- * Description: Critical failure detected: terminate flight
+ * Description: Terminating flight due to a critical failure
  * Component ID: 31e0c252-5a6a-43fd-965a-40bd5556c257
  * Tags: FAILURE;SEVERITY_10;px4;commander;failure-detector;time
  * Payload type:
@@ -74,7 +74,7 @@ extern "C" {
 
 /*
  * Name: BATTERY_WARNING_LEVEL
- * Description: Battery warn level received
+ * Description: Battery warning level received
  * Component ID: 31e0c252-5a6a-43fd-965a-40bd5556c257
  * Tags: px4;commander;battery;power
  * Payload type: u8
@@ -94,7 +94,7 @@ extern "C" {
 
 /*
  * Name: FAILURE_DETECTOR_RESET_ATTITUDE_STATUS
- * Description: Failure detector reset attitude status
+ * Description: Failure detector reset the attitude status
  * Component ID: 31e0c252-5a6a-43fd-965a-40bd5556c257
  * Tags: px4;commander;failure-detector
  * Payload type: bool
@@ -104,7 +104,7 @@ extern "C" {
 
 /*
  * Name: FAILURE_DETECTOR_UPDATED
- * Description: Failure detector updated
+ * Description: Failure detector state updated
  * Component ID: 31e0c252-5a6a-43fd-965a-40bd5556c257
  * Tags: px4;commander;failure-detector
  * Payload type: bool
@@ -114,7 +114,7 @@ extern "C" {
 
 /*
  * Name: FAILURE_DETECTOR_ATTITUDE_STABLE
- * Description: Failure detector attitude stabilized updated
+ * Description: Updated the failure detector attitude stabilized status
  * Component ID: 31e0c252-5a6a-43fd-965a-40bd5556c257
  * Tags: px4;commander;failure-detector;time
  * Payload type: bool
@@ -124,7 +124,7 @@ extern "C" {
 
 /*
  * Name: FAILURE_DETECTOR_STATUS_ROLL_ASSERTED
- * Description: Failure detector status roll asserted
+ * Description: Failure detector roll failure asserted
  * Component ID: 31e0c252-5a6a-43fd-965a-40bd5556c257
  * Tags: EXPECTATION;SEVERITY_10;px4;commander;failure-detector;time
  * Payload type: u32
@@ -134,7 +134,7 @@ extern "C" {
 
 /*
  * Name: FAILURE_DETECTOR_STATUS_PITCH_ASSERTED
- * Description: Failure detector status pitch asserted
+ * Description: Failure detector pitch failure asserted
  * Component ID: 31e0c252-5a6a-43fd-965a-40bd5556c257
  * Tags: EXPECTATION;SEVERITY_10;px4;commander;failure-detector;time
  * Payload type: u32
@@ -144,7 +144,7 @@ extern "C" {
 
 /*
  * Name: LOW_BATTERY_RETURN_ADVISED
- * Description: Low battery level return advised
+ * Description: Return advised due to low battery level
  * Component ID: 31e0c252-5a6a-43fd-965a-40bd5556c257
  * Tags: px4;commander;battery
  * Payload type:
@@ -154,7 +154,7 @@ extern "C" {
 
 /*
  * Name: CRITICAL_BATTERY_LEVEL
- * Description: Critical battery level
+ * Description: Critical battery level detected
  * Component ID: 31e0c252-5a6a-43fd-965a-40bd5556c257
  * Tags: px4;commander;battery
  * Payload type:
@@ -164,7 +164,7 @@ extern "C" {
 
 /*
  * Name: CRITICAL_BATTERY_LANDING_ADVISED
- * Description: Critical battery level landing advised
+ * Description: Landing advised due to critical battery level
  * Component ID: 31e0c252-5a6a-43fd-965a-40bd5556c257
  * Tags: FAILURE;SEVERITY_7;px4;commander;battery
  * Payload type:
@@ -174,7 +174,7 @@ extern "C" {
 
 /*
  * Name: CRITICAL_BATTERY_RTL
- * Description: Critical battery level RTL
+ * Description: Return-to-landing due to critical battery level
  * Component ID: 31e0c252-5a6a-43fd-965a-40bd5556c257
  * Tags: FAILURE;SEVERITY_8;px4;commander;battery
  * Payload type:
@@ -184,7 +184,7 @@ extern "C" {
 
 /*
  * Name: CRITICAL_BATTERY_RTL_FALLBACK_LANDING
- * Description: Critical battery level landing instead of RTL
+ * Description: Landing now instead of RTL due to critical battery level
  * Component ID: 31e0c252-5a6a-43fd-965a-40bd5556c257
  * Tags: FAILURE;SEVERITY_8;px4;commander;battery
  * Payload type:
@@ -194,7 +194,7 @@ extern "C" {
 
 /*
  * Name: CRITICAL_BATTERY_LANDING
- * Description: Critical battery level landing
+ * Description: Landing due to critical battery level
  * Component ID: 31e0c252-5a6a-43fd-965a-40bd5556c257
  * Tags: FAILURE;SEVERITY_8;px4;commander;battery
  * Payload type:
@@ -204,7 +204,7 @@ extern "C" {
 
 /*
  * Name: EMERGENCY_BATTERY_LEVEL
- * Description: Emergency battery level
+ * Description: Taking action due to emergency battery level
  * Component ID: 31e0c252-5a6a-43fd-965a-40bd5556c257
  * Tags: px4;commander;battery
  * Payload type:
@@ -214,7 +214,7 @@ extern "C" {
 
 /*
  * Name: EMERGENCY_BATTERY_LANDING_ADVISED
- * Description: Emergency battery level landing advised
+ * Description: Landing advised due to emergency battery level
  * Component ID: 31e0c252-5a6a-43fd-965a-40bd5556c257
  * Tags: FAILURE;SEVERITY_9;px4;commander;battery
  * Payload type:
@@ -224,7 +224,7 @@ extern "C" {
 
 /*
  * Name: EMERGENCY_BATTERY_RTL
- * Description: Emergency battery level RTL
+ * Description: Return-to-landing due to emergency battery level
  * Component ID: 31e0c252-5a6a-43fd-965a-40bd5556c257
  * Tags: FAILURE;SEVERITY_9;px4;commander;battery
  * Payload type:
@@ -234,7 +234,7 @@ extern "C" {
 
 /*
  * Name: EMERGENCY_BATTERY_RTL_FALLBACK_LANDING
- * Description: Emergency battery level landing instead of RTL
+ * Description: Landing now instead of RTL due to emergency battery level
  * Component ID: 31e0c252-5a6a-43fd-965a-40bd5556c257
  * Tags: FAILURE;SEVERITY_9;px4;commander;battery
  * Payload type:
@@ -244,7 +244,7 @@ extern "C" {
 
 /*
  * Name: EMERGENCY_BATTERY_LANDING
- * Description: Emergency battery level landing
+ * Description: Landing due to emergency battery level
  * Component ID: 31e0c252-5a6a-43fd-965a-40bd5556c257
  * Tags: FAILURE;SEVERITY_9;px4;commander;battery
  * Payload type:
@@ -254,7 +254,7 @@ extern "C" {
 
 /*
  * Name: BATTERY_FAILURE_DETECTED
- * Description: Battery failure detected
+ * Description: A failure with the battery was detected
  * Component ID: 31e0c252-5a6a-43fd-965a-40bd5556c257
  * Tags: FAILURE;SEVERITY_10;px4;commander;battery
  * Payload type:

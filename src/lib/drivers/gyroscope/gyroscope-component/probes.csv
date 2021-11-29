@@ -1,2 +1,2 @@
 component_id,id,name,description,tags,file,line
-6779bbe8-b7eb-447c-b4b5-56a9d7c00aa2,441590204,PX4_GYROSCOPE,Gyroscope probe,px4;library;gyroscope;sensor;control-plane,gyroscope/PX4Gyroscope.cpp,74
+6779bbe8-b7eb-447c-b4b5-56a9d7c00aa2,441590204,GYROSCOPE,Gyroscope probe,px4;library;gyroscope;sensor;control-plane,gyroscope/PX4Gyroscope.cpp,74

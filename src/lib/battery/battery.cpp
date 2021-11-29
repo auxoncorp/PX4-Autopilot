@@ -114,16 +114,16 @@ Battery::Battery(int index, ModuleParams *parent, const int sample_interval_us) 
     err = MODALITY_PROBE_INIT(
             &_probe_storage[0],
             sizeof(_probe_storage),
-            PX4_BATTERY,
+            BATTERY,
             PX4_WALL_CLOCK_RESOLUTION_NS,
             PX4_WALL_CLOCK_ID,
             &next_persistent_sequence_id,
             NULL, /* No user data needed for our next_persistent_sequence_id implementation */
             &_probe,
             MODALITY_TAGS("px4", "library", "battery", "power", "control-plane"),
-            "Battery probe");
+            "Battery and power management probe");
     assert(err == MODALITY_PROBE_ERROR_OK);
-    LOG_PROBE_INIT_W_RECVR(PX4_BATTERY, UDP_CONTROL_RECVR_BATTERY);
+    LOG_PROBE_INIT_W_RECVR(BATTERY, UDP_CONTROL_RECVR_BATTERY);
 
     hrt_call_init(&_report_call);
     hrt_call_every(
@@ -168,7 +168,7 @@ void Battery::reset()
             _probe,
             STATE_RESET,
             MODALITY_TAGS("px4", "battery", "power"),
-            "Battery reset it's state");
+            "Battery filters and monitoring state reset");
     assert(err == MODALITY_PROBE_ERROR_OK);
 }
 
@@ -206,7 +206,7 @@ void Battery::updateBatteryStatus(const hrt_abstime &timestamp, float voltage_v,
                 _voltage_filter_v.getState(),
                 hrt_time_ns(),
                 MODALITY_TAGS("px4", "battery", "voltage", "power", "time"),
-                "Battery filtered voltage [volts]");
+                "Post-filter battery voltage [volts]");
         assert(err == MODALITY_PROBE_ERROR_OK);
     }
 
@@ -236,7 +236,7 @@ void Battery::updateBatteryStatus(const hrt_abstime &timestamp, float voltage_v,
             WARNING_LEVEL,
             (uint8_t) _warning,
             MODALITY_TAGS("px4", "battery", "power"),
-            "Battery warning level");
+            "Battery voltage warning level");
     assert(err == MODALITY_PROBE_ERROR_OK);
 
 	if (_voltage_filter_v.getState() > 2.1f) {
@@ -374,7 +374,7 @@ void Battery::determineWarning(bool connected)
                     hrt_time_ns(),
                     MODALITY_TAGS("px4", "battery", "power"),
                     MODALITY_SEVERITY(10),
-                    "Battery emergency warning level");
+                    "Battery warning level has reached the emergency threshold");
             assert(err == MODALITY_PROBE_ERROR_OK);
 		} else if (_remaining < _params.crit_thr) {
 			_warning = battery_status_s::BATTERY_WARNING_CRITICAL;

@@ -54,7 +54,7 @@ px4_add_module(
 modality_probe_generate_manifest(
     TARGET modules__land_detector
     DEPENDS LandDetector.cpp
-    COMPONENT_NAME "land-detector-component"
+    COMPONENT_NAME "land-detector"
     OUTPUT_PATH "land-detector-component"
     FILE_EXTENSIONS "cpp"
     SOURCE_PATH "."

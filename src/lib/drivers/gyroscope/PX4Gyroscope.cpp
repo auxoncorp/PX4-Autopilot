@@ -74,7 +74,7 @@ PX4Gyroscope::PX4Gyroscope(uint32_t device_id, ORB_PRIO priority, enum Rotation 
     err = MODALITY_PROBE_INIT(
             &_probe_storage[0],
             sizeof(_probe_storage),
-            PX4_GYROSCOPE,
+            GYROSCOPE,
             PX4_WALL_CLOCK_RESOLUTION_NS,
             PX4_WALL_CLOCK_ID,
             &next_persistent_sequence_id,
@@ -83,7 +83,7 @@ PX4Gyroscope::PX4Gyroscope(uint32_t device_id, ORB_PRIO priority, enum Rotation 
             MODALITY_TAGS("px4", "library", "gyroscope", "sensor", "control-plane"),
             "Gyroscope probe");
     assert(err == MODALITY_PROBE_ERROR_OK);
-    LOG_PROBE_INIT_W_RECVR(PX4_GYROSCOPE, UDP_CONTROL_RECVR_GYROSCOPE);
+    LOG_PROBE_INIT_W_RECVR(GYROSCOPE, UDP_CONTROL_RECVR_GYROSCOPE);
 
     hrt_call_init(&_report_call);
     hrt_call_every(
@@ -216,27 +216,27 @@ void PX4Gyroscope::Publish(const hrt_abstime &timestamp_sample, float x, float y
         _log_data.store(false);
         err = MODALITY_PROBE_RECORD_W_F32_W_TIME(
                 _probe,
-                X_AXIS,
+                ROLL_ANGULAR_RATE,
                 report.x,
                 US_TO_NS(report.timestamp),
                 MODALITY_TAGS("px4", "gyroscope", "sensor", "time"),
-                "Gyroscope x axis [radians/second]");
+                "Gyroscope x axis roll angular rate [radians/second]");
         assert(err == 0);
         err = MODALITY_PROBE_RECORD_W_F32_W_TIME(
                 _probe,
-                Y_AXIS,
+                PITCH_ANGULAR_RATE,
                 report.y,
                 US_TO_NS(report.timestamp),
                 MODALITY_TAGS("px4", "gyroscope", "sensor", "time"),
-                "Gyroscope y axis [radians/second]");
+                "Gyroscope y axis pitch angular rate [radians/second]");
         assert(err == 0);
         err = MODALITY_PROBE_RECORD_W_F32_W_TIME(
                 _probe,
-                Z_AXIS,
+                YAW_ANGULAR_RATE,
                 report.z,
                 US_TO_NS(report.timestamp),
                 MODALITY_TAGS("px4", "gyroscope", "sensor", "time"),
-                "Gyroscope z axis [radians/second]");
+                "Gyroscope z axis yaw angular rate [radians/second]");
         assert(err == 0);
     }
 

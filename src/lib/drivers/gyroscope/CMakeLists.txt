@@ -45,7 +45,7 @@ target_link_libraries(drivers_gyroscope PRIVATE conversion drivers__device modal
 modality_probe_generate_manifest(
     TARGET drivers_gyroscope
     DEPENDS PX4Gyroscope.cpp
-    COMPONENT_NAME "gyroscope-component"
+    COMPONENT_NAME "gyroscope"
     OUTPUT_PATH "gyroscope-component"
     EXCLUDES "generated_mutators"
     FILE_EXTENSIONS "cpp"

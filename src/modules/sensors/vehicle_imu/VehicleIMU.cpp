@@ -37,7 +37,7 @@
 
 #include <float.h>
 
-#include "vehicle_imu_component_definitions.h"
+#include "../data_acquisition_component_definitions.h"
 
 using namespace matrix;
 using namespace time_literals;
@@ -80,7 +80,7 @@ VehicleIMU::VehicleIMU(uint8_t accel_index, uint8_t gyro_index) :
     const size_t err = MODALITY_PROBE_INIT(
             &_probe_storage[0],
             sizeof(_probe_storage),
-            PX4_VEHICLE_IMU,
+            VEHICLE_IMU,
             PX4_WALL_CLOCK_RESOLUTION_NS,
             PX4_WALL_CLOCK_ID,
             &next_persistent_sequence_id,
@@ -89,7 +89,7 @@ VehicleIMU::VehicleIMU(uint8_t accel_index, uint8_t gyro_index) :
             MODALITY_TAGS("px4", "library", "vehicle-imu"),
             "Vehicle IMU probe");
     assert(err == MODALITY_PROBE_ERROR_OK);
-    LOG_PROBE_INIT(PX4_VEHICLE_IMU);
+    LOG_PROBE_INIT(VEHICLE_IMU);
 
     hrt_call_init(&_report_call);
     hrt_call_every(
@@ -359,7 +359,7 @@ void VehicleIMU::Run()
             GYRO_INTEGRATOR_READY,
             _gyro_integrator.integral_ready(),
             MODALITY_TAGS("px4", "vehicle-imu", "gyroscope"),
-            "Gyroscope integrator ready");
+            "Vehicle IMU gyroscope integrator ready status");
     assert(err == MODALITY_PROBE_ERROR_OK);
 
 	// publish if both accel & gyro integrators are ready

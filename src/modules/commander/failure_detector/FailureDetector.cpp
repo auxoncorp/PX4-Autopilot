@@ -66,7 +66,7 @@ bool FailureDetector::resetAttitudeStatus()
             FAILURE_DETECTOR_RESET_ATTITUDE_STATUS,
             status_changed,
             MODALITY_TAGS("px4", "commander", "failure-detector"),
-            "Failure detector reset attitude status");
+            "Failure detector reset the attitude status");
     assert(err == MODALITY_PROBE_ERROR_OK);
 
 	return status_changed;
@@ -102,7 +102,7 @@ FailureDetector::update(const vehicle_status_s &vehicle_status)
             FAILURE_DETECTOR_UPDATED,
             updated, /* Log status_changed */
             MODALITY_TAGS("px4", "commander", "failure-detector"),
-            "Failure detector updated");
+            "Failure detector state updated");
     assert(err == MODALITY_PROBE_ERROR_OK);
 
 	return updated;
@@ -131,7 +131,7 @@ FailureDetector::isAttitudeStabilized(const vehicle_status_s &vehicle_status)
             attitude_is_stabilized,
             hrt_time_ns(),
             MODALITY_TAGS("px4", "commander", "failure-detector", "time"),
-            "Failure detector attitude stabilized updated");
+            "Updated the failure detector attitude stabilized status");
     assert(err == MODALITY_PROBE_ERROR_OK);
 
 	return attitude_is_stabilized;
@@ -189,7 +189,7 @@ FailureDetector::updateAttitudeStatus()
                 US_TO_NS(time_now),
                 MODALITY_TAGS("px4", "commander", "failure-detector", "time"),
                 MODALITY_SEVERITY(10),
-                "Failure detector status roll asserted");
+                "Failure detector roll failure asserted");
         assert(err == MODALITY_PROBE_ERROR_OK);
 
         err = MODALITY_PROBE_EXPECT_W_TIME(
@@ -199,7 +199,7 @@ FailureDetector::updateAttitudeStatus()
                 US_TO_NS(time_now),
                 MODALITY_TAGS("px4", "commander", "failure-detector", "time"),
                 MODALITY_SEVERITY(10),
-                "Failure detector status pitch asserted");
+                "Failure detector pitch failure asserted");
         assert(err == MODALITY_PROBE_ERROR_OK);
 
 		updated = true;

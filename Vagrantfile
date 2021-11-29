@@ -7,30 +7,29 @@ Vagrant.configure("2") do |config|
   config.vm.provider :virtualbox do |v|
     v.gui = true
     v.memory = 8192
-    v.cpus = 2
+    v.cpus = 4
   end
 
-  # Can't build from the synced_folder
-  #config.vm.synced_folder ".", "/home/vagrant/PX4-Autopilot"
+  #config.vm.synced_folder ".", "/home/vagrant/px4"
 
   config.vm.provision 'shell', inline: <<-EOF
 #!/bin/sh
 set -e
 export DEBIAN_FRONTEND=noninteractive
 
-sudo apt update -y
-sudo apt upgrade -y
-sudo apt install -y --no-install-recommends ubuntu-desktop
-sudo apt install -y --no-install-recommends virtualbox-guest-dkms virtualbox-guest-utils virtualbox-guest-x11 virtualbox-guest-additions-iso
+sudo apt-get update -y
+sudo apt-get upgrade -y
+sudo apt-get install -y --no-install-recommends ubuntu-desktop
+sudo apt-get install -y --no-install-recommends virtualbox-guest-dkms virtualbox-guest-utils virtualbox-guest-x11 virtualbox-guest-additions-iso
 sudo usermod -a -G sudo vagrant
-sudo apt install -y firefox
+sudo apt-get install -y firefox
 
 TEMP_DEB="$(mktemp)"
 wget -q -O "$TEMP_DEB" https://github.com/mavlink/MAVSDK/releases/download/v0.29.0/mavsdk_0.29.0_ubuntu20.04_amd64.deb
 sudo dpkg -i "$TEMP_DEB"
 rm -f "$TEMP_DEB"
 
-sudo apt install -y --no-install-recommends \
+sudo apt-get install -y --no-install-recommends \
     net-tools \
     astyle \
     build-essential \
@@ -59,7 +58,7 @@ sudo apt install -y --no-install-recommends \
 
 sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
 wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
-sudo apt install -y --no-install-recommends \
+sudo apt-get install -y --no-install-recommends \
     dmidecode \
     gazebo9 \
     gstreamer1.0-plugins-bad \

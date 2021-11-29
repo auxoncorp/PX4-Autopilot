@@ -56,7 +56,7 @@ LandDetector::LandDetector() :
     const size_t err = MODALITY_PROBE_INIT(
             &_probe_storage[0],
             sizeof(_probe_storage),
-            PX4_LAND_DETECTOR,
+            LAND_DETECTOR,
             PX4_WALL_CLOCK_RESOLUTION_NS,
             PX4_WALL_CLOCK_ID,
             &next_persistent_sequence_id,
@@ -65,7 +65,7 @@ LandDetector::LandDetector() :
             MODALITY_TAGS("px4", "module", "land-detector"),
             "Land detector probe");
     assert(err == MODALITY_PROBE_ERROR_OK);
-    LOG_PROBE_INIT(PX4_LAND_DETECTOR);
+    LOG_PROBE_INIT(LAND_DETECTOR);
 
     hrt_call_init(&_report_call);
     hrt_call_every(
@@ -151,28 +151,28 @@ void LandDetector::Run()
                 FREEFALL,
                 freefallDetected,
                 MODALITY_TAGS("px4", "land-detector", "freefall"),
-                "Land detector freefall");
+                "Freefall detection status");
         assert(err == MODALITY_PROBE_ERROR_OK);
         err = MODALITY_PROBE_RECORD_W_BOOL(
                 _probe,
                 GROUND_CONTACT,
                 ground_contactDetected,
                 MODALITY_TAGS("px4", "land-detector"),
-                "Land detector ground contact");
+                "Ground contact detection status");
         assert(err == MODALITY_PROBE_ERROR_OK);
         err = MODALITY_PROBE_RECORD_W_BOOL(
                 _probe,
                 MAYBE_LANDED,
                 maybe_landedDetected,
                 MODALITY_TAGS("px4", "land-detector"),
-                "Land detector might have landed");
+                "Maybe landed detection status");
         assert(err == MODALITY_PROBE_ERROR_OK);
         err = MODALITY_PROBE_RECORD_W_BOOL(
                 _probe,
                 LANDED,
                 landDetected,
                 MODALITY_TAGS("px4", "land-detector"),
-                "Land detector currently landed (stage 3)");
+                "Fused land detection status");
         assert(err == MODALITY_PROBE_ERROR_OK);
 
 		if (!landDetected && _land_detected.landed && _takeoff_time == 0) { /* only set take off time once, until disarming */
@@ -181,9 +181,9 @@ void LandDetector::Run()
 
             err = MODALITY_PROBE_RECORD(
                     _probe,
-                    TAKE_OFF_DETECTED,
+                    TAKEOFF_DETECTED,
                     MODALITY_TAGS("px4", "land-detector", "takeoff"),
-                    "Take off detected");
+                    "Takeoff detected");
             assert(err == MODALITY_PROBE_ERROR_OK);
 		}
 

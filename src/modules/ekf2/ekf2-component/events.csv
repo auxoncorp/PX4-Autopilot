@@ -16,5 +16,5 @@ component_id,id,name,description,tags,type_hint,file,line
 7e757c1d-7416-4b23-80fd-958294b055da,1073741688,MODALITY_CONTROL_MSG_DROPPED,Modulus control message dropped,INTERNAL,u32,,
 7e757c1d-7416-4b23-80fd-958294b055da,1073741687,MODALITY_TRIGGER_DROPPED,Modulus trigger control block dropped,INTERNAL,u32,,
 7e757c1d-7416-4b23-80fd-958294b055da,1073741686,MODALITY_MUTATION_EPOCH_ADVANCED,Mutation epoch advanced,INTERNAL,u16,,
-7e757c1d-7416-4b23-80fd-958294b055da,1,X_AXIS,EKF2 phi roll angle [radians],px4;ekf2;time,f32,ekf2/ekf2_main.cpp,1899
-7e757c1d-7416-4b23-80fd-958294b055da,2,Y_AXIS,EKF2 theta pitch angle [radians],px4;ekf2;time,f32,ekf2/ekf2_main.cpp,1908
+7e757c1d-7416-4b23-80fd-958294b055da,1,ROLL_ANGLE,EKF2 estimated phi roll angle [radians],px4;ekf2;time,f32,ekf2/ekf2_main.cpp,1899
+7e757c1d-7416-4b23-80fd-958294b055da,2,PITCH_ANGLE,EKF2 estimated theta pitch angle [radians],px4;ekf2;time,f32,ekf2/ekf2_main.cpp,1908

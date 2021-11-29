@@ -70,15 +70,15 @@ modality_probe_generate_manifest(
     DEPENDS
         sensors.cpp
         voted_sensors_update.cpp
-    COMPONENT_NAME "sensors-component"
-    OUTPUT_PATH "sensors-component"
+        vehicle_imu/VehicleIMU.cpp
+    COMPONENT_NAME "data-acquisition"
+    OUTPUT_PATH "data-acquisition-component"
     FILE_EXTENSIONS "cpp"
-    EXCLUDES "vehicle_imu"
     SOURCE_PATH "."
     )
 
 modality_probe_generate_header(
     TARGET modules__sensors
-    OUTPUT_FILE "sensors_component_definitions.h"
-    COMPONENT_PATH "sensors-component"
+    OUTPUT_FILE "data_acquisition_component_definitions.h"
+    COMPONENT_PATH "data-acquisition-component"
     )

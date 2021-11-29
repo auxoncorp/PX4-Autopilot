@@ -673,16 +673,16 @@ Ekf2::Ekf2(bool replay_mode):
     const size_t err = MODALITY_PROBE_INIT(
             &_probe_storage[0],
             sizeof(_probe_storage),
-            PX4_EKF2,
+            SENSOR_FUSION,
             PX4_WALL_CLOCK_RESOLUTION_NS,
             PX4_WALL_CLOCK_ID,
             &next_persistent_sequence_id,
             NULL, /* No user data needed for our next_persistent_sequence_id implementation */
             &_probe,
             MODALITY_TAGS("px4", "module", "ekf2"),
-            "EKF2 probe");
+            "Sensor fusion probe");
     assert(err == MODALITY_PROBE_ERROR_OK);
-    LOG_PROBE_INIT(PX4_EKF2);
+    LOG_PROBE_INIT(SENSOR_FUSION);
 
     hrt_call_init(&_report_call);
     hrt_call_every(
@@ -1898,20 +1898,20 @@ void Ekf2::publish_attitude(const hrt_abstime &timestamp)
             _log_data.store(false);
             err = MODALITY_PROBE_RECORD_W_F32_W_TIME(
                     _probe,
-                    X_AXIS,
+                    ROLL_ANGLE,
                     euler.phi(),
                     US_TO_NS(timestamp),
                     MODALITY_TAGS("px4", "ekf2", "time"),
-                    "EKF2 phi roll angle [radians]");
+                    "EKF2 estimated phi roll angle [radians]");
             assert(err == MODALITY_PROBE_ERROR_OK);
 
             err = MODALITY_PROBE_RECORD_W_F32_W_TIME(
                     _probe,
-                    Y_AXIS,
+                    PITCH_ANGLE,
                     euler.theta(),
                     US_TO_NS(timestamp),
                     MODALITY_TAGS("px4", "ekf2", "time"),
-                    "EKF2 theta pitch angle [radians]");
+                    "EKF2 estimated theta pitch angle [radians]");
             assert(err == MODALITY_PROBE_ERROR_OK);
         }
 

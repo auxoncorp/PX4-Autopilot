@@ -1,5 +1,0 @@
-name = "sensors-component"
-id = "81e416a3-7250-47d4-9c24-3b6f1c6fbcdc"
-code_hash = "8842aa3b2cbf62dd68f490f7a51b2fd90a0270cab3a7dd338f194d1d890c1995"
-instrumentation_hash = "22ff54db8a8d628d190f5e525d45c536e208aea40bae7a60af4a3e29db5ff609"
-tags = ["px4", "sensors"]

@@ -2,10 +2,10 @@
  * GENERATED CODE, DO NOT EDIT
  *
  * Component:
- *   Name: battery-component
+ *   Name: battery
  *   ID: f8b467f7-c6ea-495d-b7be-a4d008afb5ba
- *   Code hash: 066302afec5a02a0193e78317db18845f6f25e02f6d0a4b80a83fb3470d7fb91
- *   Instrumentation hash: d631af55b4e114cb933dd7ea5734c3f534fab58a5da728e7a196e940ad0ecd07
+ *   Code hash: e10b86f8d43fb5869a7e1d94ea39b56d558ade0bd05ea3bcf6a4d3f1624b6a80
+ *   Instrumentation hash: 68b60c3982da07a1d71ca8070413d36fc95bad5678e2759d77a9ec56195b8a98
  */
 
 #ifndef MODALITY_PROBE_GENERATED_IDENTIFIERS_H
@@ -16,25 +16,25 @@ extern "C" {
 #endif
 
 /*
- * Probes (sha3-256 e8004c79e5143326196497d9007dff40924c24566b9f478b271911efc8956350)
+ * Probes (sha3-256 8476f50b0f7c93a9600897da2ccf91938e6ea1ffcec5f40542dd802646beb61a)
  */
 
 /*
- * Name: PX4_BATTERY
- * Description: Battery probe
+ * Name: BATTERY
+ * Description: Battery and power management probe
  * Component ID: f8b467f7-c6ea-495d-b7be-a4d008afb5ba
  * Tags: px4;library;battery;power;control-plane
  * Location: battery/battery.cpp:114
  */
-#define PX4_BATTERY (318704251UL)
+#define BATTERY (318704251UL)
 
 /*
- * Events (sha3-256 4069ce3466c5db84db66c9d7646dbeb0f1d11ff1f08282d94450631fbbc2e904)
+ * Events (sha3-256 f69e7046ead25491659c16f27ad4e387e3780cd7ad6cfe8622a7925b77060e7e)
  */
 
 /*
  * Name: STATE_RESET
- * Description: Battery reset it's state
+ * Description: Battery filters and monitoring state reset
  * Component ID: f8b467f7-c6ea-495d-b7be-a4d008afb5ba
  * Tags: px4;battery;power
  * Payload type:
@@ -44,7 +44,7 @@ extern "C" {
 
 /*
  * Name: FILTERED_VOLTAGE
- * Description: Battery filtered voltage [volts]
+ * Description: Post-filter battery voltage [volts]
  * Component ID: f8b467f7-c6ea-495d-b7be-a4d008afb5ba
  * Tags: px4;battery;voltage;power;time
  * Payload type: f32
@@ -54,7 +54,7 @@ extern "C" {
 
 /*
  * Name: WARNING_LEVEL
- * Description: Battery warning level
+ * Description: Battery voltage warning level
  * Component ID: f8b467f7-c6ea-495d-b7be-a4d008afb5ba
  * Tags: px4;battery;power
  * Payload type: u8
@@ -64,7 +64,7 @@ extern "C" {
 
 /*
  * Name: EMERGENCY_WARNING_LEVEL
- * Description: Battery emergency warning level
+ * Description: Battery warning level has reached the emergency threshold
  * Component ID: f8b467f7-c6ea-495d-b7be-a4d008afb5ba
  * Tags: FAILURE;SEVERITY_10;px4;battery;power
  * Payload type:

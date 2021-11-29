@@ -55,7 +55,7 @@ px4_add_module(
 modality_probe_generate_manifest(
     TARGET modules__ekf2
     DEPENDS ekf2_main.cpp
-    COMPONENT_NAME "ekf2-component"
+    COMPONENT_NAME "ekf2"
     OUTPUT_PATH "ekf2-component"
     FILE_EXTENSIONS "cpp"
     SOURCE_PATH "."

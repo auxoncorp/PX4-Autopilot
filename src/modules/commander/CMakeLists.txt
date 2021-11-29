@@ -69,7 +69,7 @@ modality_probe_generate_manifest(
         Commander.cpp
         failure_detector/FailureDetector.cpp
         state_machine_helper.cpp
-    COMPONENT_NAME "commander-component"
+    COMPONENT_NAME "commander"
     OUTPUT_PATH "commander-component"
     FILE_EXTENSIONS "cpp"
     SOURCE_PATH "."

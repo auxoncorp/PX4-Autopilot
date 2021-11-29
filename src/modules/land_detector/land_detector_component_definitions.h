@@ -2,10 +2,10 @@
  * GENERATED CODE, DO NOT EDIT
  *
  * Component:
- *   Name: land-detector-component
+ *   Name: land-detector
  *   ID: a3d31cc0-c05d-4653-a225-32f29eec463f
- *   Code hash: 7f2beaf3877a20bf8b5ea1f7ae2e8a755a2847c061da3cbf01c97e140e7e324b
- *   Instrumentation hash: 11cd3fe8d11560297b044e7961ef14e8b2a36432eccb005b701bb90910009e3b
+ *   Code hash: b32e1eff09672c7a8119f34ba734ee42fab8b3fead8b796a3909ad2a8e19c9dc
+ *   Instrumentation hash: c3c91765ce7cc297b432d7e86c831e3d261863ae846e80748f5d15a0b20710a9
  */
 
 #ifndef MODALITY_PROBE_GENERATED_IDENTIFIERS_H
@@ -16,25 +16,25 @@ extern "C" {
 #endif
 
 /*
- * Probes (sha3-256 ca179e21d96ec42f357ee523e4022d774da925a1d48ac0095f4cd759ed0e3d33)
+ * Probes (sha3-256 8c3ba0e3184661f9896dc19dec7e410994817207b9974886f71905a375d57857)
  */
 
 /*
- * Name: PX4_LAND_DETECTOR
+ * Name: LAND_DETECTOR
  * Description: Land detector probe
  * Component ID: a3d31cc0-c05d-4653-a225-32f29eec463f
  * Tags: px4;module;land-detector
  * Location: land_detector/LandDetector.cpp:56
  */
-#define PX4_LAND_DETECTOR (433462535UL)
+#define LAND_DETECTOR (433462535UL)
 
 /*
- * Events (sha3-256 5ecf2cfca0b4ab40f7cf8ce06e739cbb6a77abb63b34b93e029e57264ae6156b)
+ * Events (sha3-256 4c579b4925b588ff30ef3786261eb60b6125bedf93878c0fd05fd7ae799ba1b1)
  */
 
 /*
  * Name: FREEFALL
- * Description: Land detector freefall
+ * Description: Freefall detection status
  * Component ID: a3d31cc0-c05d-4653-a225-32f29eec463f
  * Tags: px4;land-detector;freefall
  * Payload type: bool
@@ -44,7 +44,7 @@ extern "C" {
 
 /*
  * Name: GROUND_CONTACT
- * Description: Land detector ground contact
+ * Description: Ground contact detection status
  * Component ID: a3d31cc0-c05d-4653-a225-32f29eec463f
  * Tags: px4;land-detector
  * Payload type: bool
@@ -54,7 +54,7 @@ extern "C" {
 
 /*
  * Name: MAYBE_LANDED
- * Description: Land detector might have landed
+ * Description: Maybe landed detection status
  * Component ID: a3d31cc0-c05d-4653-a225-32f29eec463f
  * Tags: px4;land-detector
  * Payload type: bool
@@ -64,7 +64,7 @@ extern "C" {
 
 /*
  * Name: LANDED
- * Description: Land detector currently landed (stage 3)
+ * Description: Fused land detection status
  * Component ID: a3d31cc0-c05d-4653-a225-32f29eec463f
  * Tags: px4;land-detector
  * Payload type: bool
@@ -73,14 +73,14 @@ extern "C" {
 #define LANDED (4UL)
 
 /*
- * Name: TAKE_OFF_DETECTED
- * Description: Take off detected
+ * Name: TAKEOFF_DETECTED
+ * Description: Takeoff detected
  * Component ID: a3d31cc0-c05d-4653-a225-32f29eec463f
  * Tags: px4;land-detector;takeoff
  * Payload type:
  * Location: land_detector/LandDetector.cpp:182
  */
-#define TAKE_OFF_DETECTED (5UL)
+#define TAKEOFF_DETECTED (5UL)
 
 #ifdef __cplusplus
 } /* extern "C" */

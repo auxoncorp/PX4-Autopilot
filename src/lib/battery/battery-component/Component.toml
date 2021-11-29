@@ -1,5 +1,5 @@
-name = "battery-component"
+name = "battery"
 id = "f8b467f7-c6ea-495d-b7be-a4d008afb5ba"
-code_hash = "066302afec5a02a0193e78317db18845f6f25e02f6d0a4b80a83fb3470d7fb91"
-instrumentation_hash = "d631af55b4e114cb933dd7ea5734c3f534fab58a5da728e7a196e940ad0ecd07"
+code_hash = "e10b86f8d43fb5869a7e1d94ea39b56d558ade0bd05ea3bcf6a4d3f1624b6a80"
+instrumentation_hash = "68b60c3982da07a1d71ca8070413d36fc95bad5678e2759d77a9ec56195b8a98"
 tags = ["px4", "battery"]
