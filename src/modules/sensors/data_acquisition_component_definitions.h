@@ -5,7 +5,7 @@
  *   Name: data-acquisition
  *   ID: 81e416a3-7250-47d4-9c24-3b6f1c6fbcdc
  *   Code hash: cfbfb5bab3358c58698bce0550fa5daffd05311eeb4d33dfff1d2d72597798b3
- *   Instrumentation hash: fa27f31c7b0b5fbc7125acbf21230305f818f65f1731bad037b8295ef0ed535e
+ *   Instrumentation hash: c45620deee3706100f4d767ceac183fe6917c5cb6bbd2ca5f80ea153c99564ab
  */
 
 #ifndef MODALITY_PROBE_GENERATED_IDENTIFIERS_H

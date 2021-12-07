@@ -1,0 +1,5 @@
+FOR EACH ROLL_ANGLE @ SENSOR_FUSION (payload >= 1.5708 OR payload <= -1.5708) AS Flipped
+    VERIFY
+        Flipped
+        -> FAILURE_DETECTOR_STATUS_ROLL_ASSERTED @ COMMANDER
+        -> FLIGHT_TERMINATED @ COMMANDER AS FlightTerminated

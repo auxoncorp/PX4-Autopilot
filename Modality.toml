@@ -22,3 +22,4 @@ control_connections = [
 ]
 [user]
 email = "px4-user"
+#license_key = "ADD_LICENSE_KEY_HERE"

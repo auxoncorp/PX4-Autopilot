@@ -89,6 +89,7 @@ public:
     void modality_open_scope(const std::string name);
     void modality_close_scope(const std::string name);
     void modality_auto_mutate_for_objective_if_set();
+    void setup_simulator_environmental_conditions();
 
 private:
 	mavsdk::geometry::CoordinateTransformation get_coordinate_transformation();

@@ -7,12 +7,20 @@ Vagrant.configure("2") do |config|
   config.vm.provider :virtualbox do |v|
     v.gui = true
     v.memory = 8192
-    v.cpus = 4
+    v.cpus = 6
+    v.customize ["modifyvm", :id, "--vram", "128"]
+    v.customize ["modifyvm", :id, "--accelerate3d", "on"]
+    v.customize ['modifyvm', :id, '--graphicscontroller', 'vboxvga']
+    #v.customize ['modifyvm', :id, '--graphicscontroller', 'vmsvga']
+    v.customize ['modifyvm', :id, '--hwvirtex', 'on']
+    v.customize ['modifyvm', :id, '--ioapic', 'on']
+    v.customize ['modifyvm', :id, '--audio', 'none']
   end
 
-  #config.vm.synced_folder ".", "/home/vagrant/px4"
+  # For local dev
+  #config.vm.synced_folder ".", "/home/vagrant/synced_folder"
 
-  config.vm.provision 'shell', inline: <<-EOF
+  config.vm.provision "bootstrap", type: "shell", inline: <<-EOF
 #!/bin/sh
 set -e
 export DEBIAN_FRONTEND=noninteractive
@@ -100,7 +108,40 @@ sudo pip3 install \
     toml \
     wheel \
     ;
+EOF
 
+  config.vm.provision "install-modality", type: 'shell', env: {"ACCEPT_MODALITY_EULA" => ENV['ACCEPT_MODALITY_EULA'], "MODALITY_DOWNLOAD_URL" => ENV['MODALITY_DOWNLOAD_URL']}, inline: <<-EOF
+#!/bin/bash
+set -e
+export DEBIAN_FRONTEND=noninteractive
+[[ "${ACCEPT_MODALITY_EULA-NO}" != "YES" ]] && echo "Set ACCEPT_MODALITY_EULA=YES" && exit 1
+echo "Modality EULA accepted"
+[[ -z "${MODALITY_DOWNLOAD_URL}" ]] && echo "Set MODALITY_DOWNLOAD_URL" && exit 1
+echo "Installing Modality"
+echo debconf modality/eula select true | debconf-set-selections
+echo debconf modality/eula seen true | debconf-set-selections
+TEMP_DEB="$(mktemp)"
+wget -q -O "$TEMP_DEB" "${MODALITY_DOWNLOAD_URL}"
+sudo dpkg -i "$TEMP_DEB"
+rm -f "$TEMP_DEB"
+EOF
+
+  config.vm.provision "px4-build", type: "shell", privileged: false, inline: <<-EOF
+#!/bin/bash
+set -e
+cd /home/vagrant
+rm -rf PX4-Autopilot
+git clone --recursive https://github.com/auxoncorp/PX4-Autopilot.git -b debugging
+cd PX4-Autopilot
+./scripts/build-mavsdk-tests
+EOF
+
+  config.vm.provision "cleanup", type: 'shell', inline: <<-EOF
+#!/bin/sh
+set -e
+export DEBIAN_FRONTEND=noninteractive
+sudo apt-get -y autoremove
+sudo apt-get clean autoclean
 sudo shutdown -r now
 EOF
 

@@ -5,7 +5,7 @@
  *   Name: commander
  *   ID: 31e0c252-5a6a-43fd-965a-40bd5556c257
  *   Code hash: 22e24ea820912732ba5f40751b360771b63c05cc34a720825f84719d852fd1b0
- *   Instrumentation hash: 9fe24da69b1cc28cfe4b5f853b72174a6270e45757b49737fecac8a20295029f
+ *   Instrumentation hash: 96c266a7e192cc04174359227d14e39eb54846d41cf4b5e3d2b3f080b6fc0b9d
  */
 
 #ifndef MODALITY_PROBE_GENERATED_IDENTIFIERS_H

@@ -39,32 +39,24 @@
 #include "autopilot_tester.h"
 
 
-TEST_CASE("Takeoff and Land", "[auxon]")
+TEST_CASE("Altitude Mission", "[auxon]")
 {
+    const std::string scope = "Altitude Mission";
     AutopilotTester tester;
     tester.connect(connection_url);
-    tester.modality_open_scope("Takeoff and Land");
+    tester.modality_open_scope(scope);
     tester.wait_until_ready();
-    tester.modality_open_scope("DroneSetup");
-
     // Enable flight termination action, triggered by the failure detector
     tester.set_i32_param("CBRK_FLIGHTTERM", 0);
-
-    // Do an objective orientated automatic mutation if the env variable is set
-    tester.modality_auto_mutate_for_objective_if_set();
-
-    tester.set_takeoff_altitude(10.0);
-    tester.modality_close_scope("DroneSetup");
-
+    tester.AutopilotTester::setup_simulator_environmental_conditions();
+    tester.set_takeoff_altitude(5.0);
     tester.arm();
-    tester.modality_open_scope("DroneOperational");
     tester.takeoff();
     tester.wait_until_hovering();
     tester.land();
     std::chrono::seconds until_disarmed_timeout = std::chrono::seconds(20);
     tester.wait_until_disarmed(until_disarmed_timeout);
-    tester.modality_close_scope("DroneOperational");
-    tester.modality_close_scope("Takeoff and Land");
+    tester.modality_close_scope(scope);
 }
 
 TEST_CASE("Fly square Multicopter Missions", "[multicopter][vtol]")

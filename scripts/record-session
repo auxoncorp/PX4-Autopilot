@@ -1,0 +1,21 @@
+#!/usr/bin/bash
+
+SUT_NAME="px4"
+DATE=$(date +"%Y-%m-%dT%H-%M-%SZ")
+SESSION_NAME="${SESSION_NAME:=$DATE}"
+
+modality sut create .
+modality sut list
+
+set -e
+
+modality sut use "$SUT_NAME"
+
+modality session open "$SESSION_NAME" "$SUT_NAME"
+modality session use "$SESSION_NAME"
+
+./scripts/run-modality-mavsdk-tests --gui
+
+modality session close "$SESSION_NAME"
+
+exit 0

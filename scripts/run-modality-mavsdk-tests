@@ -10,7 +10,7 @@ export PX4_HOME_ALT=0
 export QT_AUTO_SCREEN_SCALE_FACTOR=0
 export QT_SCREEN_SCALE_FACTORS=[1.0,1.0]
 
-TEST_CASE="Takeoff and Land"
+TEST_CASE="Altitude Mission"
 
 # To run with the GUI, add --gui to the argument list
 ./test/mavsdk_tests/mavsdk_test_runner.py \

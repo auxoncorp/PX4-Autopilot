@@ -476,3 +476,17 @@ void AutopilotTester::modality_auto_mutate_for_objective_if_set()
         CHECK(WEXITSTATUS(status) == 0);
     }
 }
+
+void AutopilotTester::setup_simulator_environmental_conditions()
+{
+    const char * const env = std::getenv("SIMULATOR_ENVIRONMENT_IMPACT");
+    if(env != NULL)
+    {
+        std::string cmd = "modality mutate --precondition='GROUND_TRUTH_ALTITUDE @ SIMULATOR (payload > 400)' impact-force-mutator@SIMULATOR link=0 force=1020";
+        std::cout << "Running Modality command: " << cmd << std::endl;
+        const int status = system(cmd.c_str());
+        CHECK(status >= 0);
+        CHECK(WIFEXITED(status));
+        CHECK(WEXITSTATUS(status) == 0);
+    }
+}

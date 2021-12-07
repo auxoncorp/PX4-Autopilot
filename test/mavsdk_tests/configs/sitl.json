@@ -9,12 +9,6 @@
             "vehicle": "iris",
             "test_filter": "[auxon]",
             "timeout_min": 10
-        },
-        {
-            "model": "standard_vtol",
-            "vehicle": "standard_vtol",
-            "test_filter": "[multicopter][vtol]",
-            "timeout_min": 10
         }
     ]
 }
