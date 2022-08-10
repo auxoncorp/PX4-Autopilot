@@ -81,6 +81,9 @@
 
 #include <uORB/topics/mavlink_log.h>
 
+#define TRACEPOINT_DEFINE
+#include "tp.h"
+
 typedef enum VEHICLE_MODE_FLAG {
 	VEHICLE_MODE_FLAG_CUSTOM_MODE_ENABLED = 1, /* 0b00000001 Reserved for future use. | */
 	VEHICLE_MODE_FLAG_TEST_ENABLED = 2, /* 0b00000010 system has a test mode enabled. This flag is intended for temporary system tests and should not be used for stable implementations. | */
@@ -1629,6 +1632,7 @@ Commander::run()
 					if (_land_detector.landed) {
 						mavlink_log_info(&mavlink_log_pub, "Landing detected");
 
+                        tracepoint(commander, land_detected);
 					} else {
 						mavlink_log_info(&mavlink_log_pub, "Takeoff detected");
 						_have_taken_off_since_arming = true;
@@ -1639,6 +1643,8 @@ Commander::run()
 						_gpos_probation_time_us = _param_com_pos_fs_prob.get() * 1_s;
 						_lpos_probation_time_us = _param_com_pos_fs_prob.get() * 1_s;
 						_lvel_probation_time_us = _param_com_pos_fs_prob.get() * 1_s;
+
+                        tracepoint(commander, takeoff_detected);
 					}
 				}
 			}
@@ -2256,6 +2262,8 @@ Commander::run()
 						_status_changed = true;
 
 						mavlink_log_emergency(&mavlink_log_pub, "Critical failure detected: lockdown");
+
+                        tracepoint(commander, lockdown_triggered);
 					}
 
 				} else if (!status_flags.circuit_breaker_flight_termination_disabled &&
@@ -2267,6 +2275,8 @@ Commander::run()
 
 					mavlink_log_emergency(&mavlink_log_pub, "Critical failure detected: terminate flight");
 					set_tune_override(TONE_PARACHUTE_RELEASE_TUNE);
+
+                    tracepoint(commander, flight_terminated);
 				}
 			}
 		}

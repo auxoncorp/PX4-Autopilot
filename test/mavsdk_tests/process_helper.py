@@ -153,6 +153,7 @@ class Px4Runner(Runner):
                 "-d"
             ]
         self.env = {"PATH": str(os.environ['PATH']),
+                    "LTTNG_HOME": str(os.environ['LTTNG_HOME']),
                     "PX4_SIM_MODEL": self.model,
                     "PX4_SIM_SPEED_FACTOR": str(speed_factor)}
         self.debugger = debugger

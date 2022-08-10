@@ -79,6 +79,9 @@
 #include "vehicle_air_data/VehicleAirData.hpp"
 #include "vehicle_imu/VehicleIMU.hpp"
 
+#define TRACEPOINT_DEFINE
+#include "tp.h"
+
 using namespace sensors;
 using namespace time_literals;
 
@@ -541,6 +544,8 @@ void Sensors::Run()
 
 	vehicle_magnetometer_s magnetometer{};
 	_voted_sensors_update.sensorsPoll(_sensor_combined, magnetometer);
+
+    tracepoint(sensors, sensors_polled);
 
 	// check analog airspeed
 	adc_poll();

@@ -40,6 +40,9 @@
 
 #include "FailureDetector.hpp"
 
+#define TRACEPOINT_DEFINE
+#include "tp.h"
+
 using namespace time_literals;
 
 FailureDetector::FailureDetector(ModuleParams *parent) :
@@ -57,6 +60,8 @@ bool FailureDetector::resetAttitudeStatus()
 		_status &= ~attitude_fields_bitmask;
 		status_changed = true;
 	}
+
+    tracepoint(failure_detector, reset_attitude_status, status_changed);
 
 	return status_changed;
 }
@@ -86,6 +91,8 @@ FailureDetector::update(const vehicle_status_s &vehicle_status)
 
 	}
 
+    tracepoint(failure_detector, updated, updated);
+
 	return updated;
 }
 
@@ -105,6 +112,8 @@ FailureDetector::isAttitudeStabilized(const vehicle_status_s &vehicle_status)
 					  nav_state != vehicle_status_s::NAVIGATION_STATE_ACRO &&
 					  nav_state != vehicle_status_s::NAVIGATION_STATE_RATTITUDE;
 	}
+
+    tracepoint(failure_detector, attitude_stable, attitude_is_stabilized);
 
 	return attitude_is_stabilized;
 }
@@ -147,6 +156,9 @@ FailureDetector::updateAttitudeStatus()
 		if (_pitch_failure_hysteresis.get_state()) {
 			_status |= FAILURE_PITCH;
 		}
+
+        tracepoint(failure_detector, status_roll_asserted, (_status & FAILURE_ROLL) != 0);
+        tracepoint(failure_detector, status_pitch_asserted, (_status & FAILURE_PITCH) != 0);
 
 		updated = true;
 	}

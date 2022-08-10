@@ -45,6 +45,9 @@
 #include <cstring>
 #include <px4_platform_common/defines.h>
 
+#define TRACEPOINT_DEFINE
+#include "tp.h"
+
 using namespace time_literals;
 
 Battery::Battery(int index, ModuleParams *parent, const int sample_interval_us) :
@@ -116,6 +119,8 @@ void Battery::reset()
 	_battery_status.capacity = _params.capacity;
 	_battery_status.temperature = NAN;
 	_battery_status.id = (uint8_t) _index;
+
+    tracepoint(battery, state_reset);
 }
 
 void Battery::updateBatteryStatus(const hrt_abstime &timestamp, float voltage_v, float current_a, bool connected,
@@ -135,6 +140,8 @@ void Battery::updateBatteryStatus(const hrt_abstime &timestamp, float voltage_v,
 	sumDischarged(timestamp, current_a);
 	estimateRemaining(_voltage_filter_v.getState(), _current_filter_a.getState(), _throttle_filter.getState());
 	computeScale();
+
+    tracepoint(battery, filtered_voltage, _voltage_filter_v.getState());
 
 	if (_battery_initialized) {
 		determineWarning(connected);
@@ -162,6 +169,8 @@ void Battery::updateBatteryStatus(const hrt_abstime &timestamp, float voltage_v,
 			_battery_status.voltage_cell_v[i] = _battery_status.voltage_filtered_v / _battery_status.cell_count;
 		}
 	}
+
+    tracepoint(battery, warning_level, _warning);
 
 	if (source == _params.source) {
 		publish();

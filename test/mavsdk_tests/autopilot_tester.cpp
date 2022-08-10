@@ -90,6 +90,14 @@ float point_to_line_distance(const std::array<float, 3> &point, const std::array
 
 }
 
+void AutopilotTester::set_i32_param(const std::string name, const int32_t value)
+{
+    CHECK(Param::Result::Success == _param->set_param_int(name, value));
+    const auto result = _param->get_param_int(name);
+    CHECK(result.first == Param::Result::Success);
+    CHECK(result.second == value);
+}
+
 void AutopilotTester::connect(const std::string uri)
 {
 	ConnectionResult ret = _mavsdk.add_any_connection(uri);
@@ -105,6 +113,7 @@ void AutopilotTester::connect(const std::string uri)
 	_action.reset(new Action(system));
 	_mission.reset(new Mission(system));
 	_offboard.reset(new Offboard(system));
+    _param.reset(new Param(system));
 }
 
 void AutopilotTester::wait_until_ready()

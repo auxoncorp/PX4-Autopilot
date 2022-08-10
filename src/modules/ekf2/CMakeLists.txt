@@ -40,6 +40,7 @@ px4_add_module(
 	STACK_MAX 2400
 	SRCS
 		ekf2_main.cpp
+        tp.c
 	DEPENDS
 		git_ecl
 		ecl_EKF

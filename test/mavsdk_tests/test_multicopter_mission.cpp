@@ -44,6 +44,9 @@ TEST_CASE("Takeoff and Land", "[multicopter][vtol]")
 	AutopilotTester tester;
 	tester.connect(connection_url);
 	tester.wait_until_ready();
+    // Enable flight termination action, triggered by the failure detector
+    tester.set_i32_param("CBRK_FLIGHTTERM", 0);
+    tester.set_takeoff_altitude(5.0);
 	tester.arm();
 	tester.takeoff();
 	tester.wait_until_hovering();

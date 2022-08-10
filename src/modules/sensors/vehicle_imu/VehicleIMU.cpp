@@ -37,6 +37,9 @@
 
 #include <float.h>
 
+#define TRACEPOINT_DEFINE
+#include "tp.h"
+
 using namespace matrix;
 using namespace time_literals;
 
@@ -320,6 +323,8 @@ void VehicleIMU::Run()
 	if (update_integrator_config) {
 		UpdateIntegratorConfiguration();
 	}
+
+    tracepoint(vehicle_imu, gyro_integrator_ready, _gyro_integrator.integral_ready());
 
 	// publish if both accel & gyro integrators are ready
 	if (_accel_integrator.integral_ready() && _gyro_integrator.integral_ready()) {

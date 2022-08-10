@@ -82,6 +82,9 @@
 
 #include "Utility/PreFlightChecker.hpp"
 
+#define TRACEPOINT_DEFINE
+#include "tp.h"
+
 // defines used to specify the mask position for use of different accuracy metrics in the GPS blending algorithm
 #define BLEND_MASK_USE_SPD_ACC      1
 #define BLEND_MASK_USE_HPOS_ACC     2
@@ -1820,6 +1823,8 @@ void Ekf2::publish_attitude(const hrt_abstime &timestamp)
 
 		_att_pub.publish(att);
 
+        Eulerf euler = matrix::Eulerf(q);
+        tracepoint(ekf2, attitude, euler.phi(), euler.theta());
 	}  else if (_replay_mode) {
 		// in replay mode we have to tell the replay module not to wait for an update
 		// we do this by publishing an attitude with zero timestamp

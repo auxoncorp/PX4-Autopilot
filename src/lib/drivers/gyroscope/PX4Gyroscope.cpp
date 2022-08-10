@@ -36,6 +36,9 @@
 
 #include <lib/drivers/device/Device.hpp>
 
+#define TRACEPOINT_DEFINE
+#include "tp.h"
+
 using namespace time_literals;
 using matrix::Vector3f;
 
@@ -137,4 +140,6 @@ void PX4Gyroscope::Publish(const hrt_abstime &timestamp_sample, float x, float y
 	report.timestamp = hrt_absolute_time();
 
 	_sensor_pub.publish(report);
+
+    tracepoint(gyroscope, sensor_gyro, &report);
 }

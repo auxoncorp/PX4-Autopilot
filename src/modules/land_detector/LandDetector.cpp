@@ -40,6 +40,9 @@
 
 #include "LandDetector.h"
 
+#define TRACEPOINT_DEFINE
+#include "tp.h"
+
 using namespace time_literals;
 
 namespace land_detector
@@ -133,6 +136,8 @@ void LandDetector::Run()
 		_land_detected.in_ground_effect = in_ground_effect;
 		_land_detected.timestamp = hrt_absolute_time();
 		_vehicle_land_detected_pub.publish(_land_detected);
+
+        tracepoint(land_detector, vehicle_land_detected, &_land_detected);
 	}
 
 	// set the flight time when disarming (not necessarily when landed, because all param changes should
@@ -150,6 +155,8 @@ void LandDetector::Run()
 
 		_param_total_flight_time_low.set(flight_time);
 		_param_total_flight_time_low.commit_no_notification();
+
+        tracepoint(land_detector, takeoff_detected);
 	}
 
 	_previous_armed_state = _armed;
